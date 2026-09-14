@@ -1,0 +1,57 @@
+﻿================================================================================
+TERN: PURE PHOTOREALISTIC MOLTEN LAVA & FULL ORANGE THEME EXPORT GUIDE
+================================================================================
+Target: Pure Molten Lava 3D Ribbon (No Grass) + Full Orange/Amber Theme Across All Pages & Controls
+
+DESIGN SPECIFICATION & RULES:
+1. 3D Ribbon:
+   - Grass completely removed (no green streamlines or blades covering the ribbon).
+   - Pure photorealistic molten lava river with Voronoi tectonic basalt crust plates.
+   - Glowing incandescent magma fissures (deep crimson #8a0000 -> radiant orange #ff4500 -> liquid gold #ffb700 -> white-hot core #fffdf0).
+   - Thermal convection animation and dynamic pointer heat wake (mouse movement cracks basalt crust into magma).
+   - Butter-smooth 60 FPS performance (spline mesh optimized to 130x18, pixelRatio capped at 1.5, powerPreference: high-performance).
+
+2. Zero Blue / Clean Orange Theme Across All UI Controls:
+   - "Spot" / "Perp (Leverage)" toggle buttons:
+     * Active state: Solid orange #ff5500 background, crisp white text, 8px border-radius, no border, no glow.
+     * Inactive state: Transparent background, subtle 5% white hover, 8px border-radius.
+   - Action / Order Buttons ("Buy ETH", "Sell ETH", "Place Limit Order"):
+     * Solid #ff5500 background, 8px border-radius, no border, no glow, box-shadow: none.
+     * Hover: #e64a00 with smooth cubic-bezier(0.16, 1, 0.3, 1) ease, no glow.
+   - Badges & Links:
+     * "[Top Up +]" link: #ffaa00 bold, no underline.
+     * Route / Venue ("Uniswap v3 Â· Robinhood Chain"): #ffaa00.
+     * Chart Symbol Badge ("ETH/USD") & "LIVE" pill: #ffaa00 with subtle rgba(255,120,0,0.15) background.
+     * Nav "Tutorial" pill: #ff8800 font-weight 600, no glow.
+     * TradingView Embed Toolbar: toolbarbg set to basalt dark #140704, matching page background.
+
+3. Global Styling:
+   - No emojis anywhere across texts or buttons.
+   - Clean non-glowing no-border boxes with subtle 8px corners (not pills).
+   - Zero glow in text, logo, and buttons (natural glow kept only inside the ribbon's molten fissures).
+   - Warm basalt dark backgrounds (#0a0403, #140704) replacing cold navy blue (#061224, #08172c).
+
+================================================================================
+READY-TO-USE PROMPT FOR YOUR OTHER AI ASSISTANT
+================================================================================
+Copy and paste this prompt directly into your other AI:
+
+--- COPY START ---
+Please update the Tern codebase with the following specifications:
+1. In landing/assets/index-D5smcTan.js:
+   - Remove the grass streamlines/blades entirely from the 3D ribbon.
+   - Keep only the pure molten lava ribbon with Voronoi basalt crust plates, glowing molten fissures, and interactive mouse heat wake.
+   - Ensure the 3D scene runs at 60 FPS with capped pixel ratio (1.5) and high-performance power preference.
+2. In 	ern-suite.js (and public/tern-suite.js):
+   - Change all remaining blue/cyan hex colors (#0ea5e9, #0284c7, #38bdf8, #3b82f6) to orange/amber (#ff5500, #ff7700, #ffaa00).
+   - "Spot" / "Perp" toggle: active background #ff5500, border-radius 8px, no border, no glow.
+   - "Buy ETH" / order button: flat #ff5500, border-radius 8px, no border, box-shadow: none.
+   - "[Top Up +]" link and Route text: #ffaa00.
+   - TradingView widget toolbar background: #140704 instead of #08172c.
+3. In _next/static/css/5f8166a425b6168a.css and all HTML pages:
+   - Replace --sky (#061224) and --paper with basalt dark tones (#0a0403, #140704).
+   - Replace --srf-tint rgba(14,165,233,...) with rgba(255,85,0,...).
+   - Remove all glowing halos and box-shadows on buttons.
+   - Ensure no emojis are used anywhere.
+--- COPY END ---
+================================================================================

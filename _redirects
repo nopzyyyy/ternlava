@@ -1,0 +1,18 @@
+# Netlify Clean Page Routes
+/radar            /pages/radar.html         200
+/trade/*          /pages/trade_eth.html     200
+/trade            /pages/trade_eth.html     200
+/portfolio        /pages/portfolio.html     200
+/yield            /pages/yield.html         200
+/theses           /pages/theses.html        200
+/recharge         /pages/recharge.html      200
+/launch           /pages/launch.html        200
+/simulate         /pages/simulate.html      200
+
+# Docs Chapter Routes
+/docs             /pages/docs/overview.html 302
+/docs/            /pages/docs/overview.html 302
+/docs/:slug       /pages/docs/:slug.html    200
+
+# Fallback for dynamic subpaths
+/*                /index.html               200

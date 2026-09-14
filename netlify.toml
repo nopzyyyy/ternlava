@@ -1,0 +1,85 @@
+[build]
+  publish = "."
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"
+    X-Content-Type-Options = "nosniff"
+
+[[headers]]
+  for = "/logos/*"
+  [headers.values]
+    Cache-Control = "public, max-age=86400"
+    Access-Control-Allow-Origin = "*"
+
+[[headers]]
+  for = "/*.js"
+  [headers.values]
+    Cache-Control = "no-cache, no-store, must-revalidate"
+
+[[redirects]]
+  from = "/recharge"
+  to = "/pages/recharge.html"
+  status = 200
+
+[[redirects]]
+  from = "/trade/*"
+  to = "/pages/trade_eth.html"
+  status = 200
+
+[[redirects]]
+  from = "/trade"
+  to = "/pages/trade_eth.html"
+  status = 200
+
+[[redirects]]
+  from = "/radar"
+  to = "/pages/radar.html"
+  status = 200
+
+[[redirects]]
+  from = "/portfolio"
+  to = "/pages/portfolio.html"
+  status = 200
+
+[[redirects]]
+  from = "/yield"
+  to = "/pages/yield.html"
+  status = 200
+
+[[redirects]]
+  from = "/theses"
+  to = "/pages/theses.html"
+  status = 200
+
+[[redirects]]
+  from = "/launch"
+  to = "/pages/launch.html"
+  status = 200
+
+[[redirects]]
+  from = "/simulate"
+  to = "/pages/simulate.html"
+  status = 200
+
+[[redirects]]
+  from = "/docs"
+  to = "/pages/docs/overview.html"
+  status = 302
+
+[[redirects]]
+  from = "/docs/"
+  to = "/pages/docs/overview.html"
+  status = 302
+
+[[redirects]]
+  from = "/docs/:slug"
+  to = "/pages/docs/:slug.html"
+  status = 200
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

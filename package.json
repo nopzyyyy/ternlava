@@ -1,0 +1,19 @@
+{
+  "name": "tern",
+  "version": "1.0.0",
+  "description": "Tern - Currents that lift & compound on Robinhood Chain",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": [
+    "tern",
+    "defi",
+    "robinhood-chain",
+    "web3",
+    "threejs"
+  ],
+  "author": "",
+  "license": "MIT"
+}

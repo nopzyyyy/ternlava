@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Currents that lift & compound. On Robinhood Chain.">
+  <title>Tern</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@1,400;1,500;1,600&display=swap" rel="stylesheet">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <script type="module" crossorigin src="/landing/assets/index-D5smcTan.js"></script>
+  <link rel="stylesheet" crossorigin href="/landing/assets/index-BxnWH-st.css">
+  <link rel="stylesheet" href="/landing/assets/water-drops.css">
+  <script type="module" src="/landing/assets/water-drops.js"></script>
+<style id="tern-dark-theme">
+  :root {
+    --font-sans: "Inter", sans-serif;
+    --font-serif: "Playfair Display", serif;
+    --sky: #080403 !important;
+    --sky-image: radial-gradient(ellipse at 50% 20%, #1f0b05 0%, #0e0503 50%, #060201 100%) !important;
+    --glass: rgba(255, 255, 255, 0.05) !important;
+    --glass-hover: rgba(255, 255, 255, 0.09) !important;
+    --glass-line: rgba(255, 255, 255, 0.12) !important;
+    --paper: rgba(20, 8, 5, 0.78) !important;
+    --paper-line: rgba(255, 255, 255, 0.12) !important;
+    --paper-hover: rgba(32, 12, 7, 0.88) !important;
+    --paper-2: rgba(26, 10, 6, 0.82) !important;
+    --paper-2-line: rgba(255, 255, 255, 0.16) !important;
+    --paper-2-hover: rgba(38, 15, 9, 0.92) !important;
+    --ink: #ffffff !important;
+    --ink-80: rgba(255, 255, 255, 0.85) !important;
+    --ink-60: rgba(255, 255, 255, 0.60) !important;
+    --srf-fill: rgba(20, 8, 5, 0.75) !important;
+    --srf-fill-hover: rgba(32, 12, 7, 0.85) !important;
+    --srf-line: rgba(255, 255, 255, 0.12) !important;
+    --srf-blur: 16px !important;
+    --srf-tint: rgba(255, 100, 30, 0.08) !important;
+    --srf-on-text: #ffffff !important;
+    --srf-on-text-80: rgba(255, 255, 255, 0.85) !important;
+    --srf-on-text-60: rgba(255, 255, 255, 0.60) !important;
+    --srf-fill-nested: rgba(26, 10, 6, 0.78) !important;
+    --srf-fill-hover-nested: rgba(38, 15, 9, 0.88) !important;
+    --srf-line-nested: rgba(255, 255, 255, 0.12) !important;
+    --txt: #ffffff !important;
+    --txt-80: rgba(255, 255, 255, 0.85) !important;
+    --txt-60: rgba(255, 255, 255, 0.60) !important;
+    --up: #34d399 !important;
+    --down: #f87171 !important;
+    --warn: #ff7700 !important;
+    --up-ink: #34d399 !important;
+    --down-ink: #f87171 !important;
+    --warn-ink: #ff8800 !important;
+  }
+
+  /* Universal: Zero Glow on Texts, Buttons, Logo */
+  *, *:before, *:after {
+    text-shadow: none !important;
+  }
+
+  html, body {
+    background: #080403 radial-gradient(ellipse at 50% 20%, #1f0b05 0%, #0e0503 50%, #060201 100%) fixed !important;
+    background-color: #080403 !important;
+    color: #ffffff !important;
+    font-family: var(--font-sans);
+    height: 100%;
+    overflow: hidden;
+  }
+
+  /* Logo: Strictly Zero Glow, Clean Original Rendering */
+  .nav-logo, .nav-logo img {
+    filter: none !important;
+    text-shadow: none !important;
+    box-shadow: none !important;
+  }
+
+  /* Headline & Text: Zero Glow, Crisp Typography */
+  .hero-heading h1, .hero-heading .line-1, .hero-heading .line-2,
+  .hero-description p, .hero-year, .year-text {
+    text-shadow: none !important;
+    filter: none !important;
+  }
+
+  /* Buttons: Non-glowing, No-border, Less-rounded Boxes (8px radius) */
+  .hero-cta {
+    pointer-events: auto !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 0.8rem 1.85rem !important;
+    border-radius: 8px !important;
+    border: none !important;
+    outline: none !important;
+    background: #ff5500 !important;
+    color: #ffffff !important;
+    font-size: 0.9375rem !important;
+    font-weight: 500 !important;
+    text-decoration: none !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+    filter: none !important;
+    cursor: pointer !important;
+    transition: background 0.25s cubic-bezier(0.16, 1, 0.3, 1), transform 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  }
+  .hero-cta:hover {
+    background: #e64a00 !important;
+    transform: translateY(-2px) !important;
+    box-shadow: none !important;
+  }
+  .hero-cta:active {
+    transform: translateY(0) scale(0.98) !important;
+  }
+
+  .nav-menu-btn {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 0.52rem 1.25rem !important;
+    border-radius: 8px !important;
+    border: none !important;
+    outline: none !important;
+    background: rgba(255, 255, 255, 0.08) !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+    color: #ffffff !important;
+    font-size: 0.875rem !important;
+    font-weight: 500 !important;
+    text-decoration: none !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+    filter: none !important;
+    cursor: pointer !important;
+    transition: background 0.25s cubic-bezier(0.16, 1, 0.3, 1), transform 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  }
+  .nav-menu-btn:hover {
+    background: rgba(255, 255, 255, 0.16) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: none !important;
+  }
+  .nav-menu-btn:active {
+    transform: translateY(0) scale(0.98) !important;
+  }
+
+  /* Navigation Pills: Clean No-Border Box */
+  .nav-pills {
+    position: absolute !important;
+    left: 50% !important;
+    transform: translate(-50%) !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.25rem !important;
+    background: rgba(20, 8, 5, 0.72) !important;
+    backdrop-filter: blur(14px) !important;
+    -webkit-backdrop-filter: blur(14px) !important;
+    border: none !important;
+    border-radius: 10px !important;
+    padding: 0.35rem 0.5rem !important;
+    box-shadow: none !important;
+  }
+  .pill {
+    font-size: 0.875rem !important;
+    font-weight: 500 !important;
+    padding: 0.38rem 0.95rem !important;
+    border-radius: 6px !important;
+    border: none !important;
+    background: transparent !important;
+    color: rgba(255, 255, 255, 0.8) !important;
+    cursor: pointer !important;
+    text-decoration: none !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+    transition: background 0.25s cubic-bezier(0.16, 1, 0.3, 1), color 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  }
+  .pill:hover {
+    background: rgba(255, 255, 255, 0.08) !important;
+    color: #ffffff !important;
+    box-shadow: none !important;
+  }
+  .pill.active {
+    background: rgba(255, 255, 255, 0.12) !important;
+    color: #ffffff !important;
+    box-shadow: none !important;
+  }
+
+  /* Social Icon: No-Border Box */
+  .nav-social {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 2.25rem !important;
+    height: 2.25rem !important;
+    border-radius: 8px !important;
+    border: none !important;
+    background: rgba(255, 255, 255, 0.08) !important;
+    backdrop-filter: blur(12px) !important;
+    color: #ffffff !important;
+    box-shadow: none !important;
+    filter: none !important;
+    transition: background 0.25s cubic-bezier(0.16, 1, 0.3, 1), transform 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  }
+  .nav-social:hover {
+    background: rgba(255, 255, 255, 0.16) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: none !important;
+  }
+
+  /* Mobile Hamburger */
+  .hamburger {
+    border-radius: 8px !important;
+    border: none !important;
+    background: rgba(255, 255, 255, 0.08) !important;
+    box-shadow: none !important;
+    transition: background 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  }
+
+  /* Guide Modal Buttons */
+  .guide-sheet {
+    background: #140704 !important;
+    border: 1px solid rgba(255, 255, 255, 0.14) !important;
+    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.85) !important;
+    border-radius: 14px !important;
+  }
+  .guide-scrim {
+    background: rgba(8, 4, 3, 0.85) !important;
+  }
+  .guide-go {
+    border-radius: 8px !important;
+    border: none !important;
+    background: #ff5500 !important;
+    color: #ffffff !important;
+    box-shadow: none !important;
+    transition: background 0.25s cubic-bezier(0.16, 1, 0.3, 1), transform 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  }
+  .guide-go:hover {
+    background: #e64a00 !important;
+    transform: translateY(-2px) !important;
+    box-shadow: none !important;
+  }
+  .guide-skip {
+    border-radius: 8px !important;
+    border: none !important;
+    background: rgba(255, 255, 255, 0.08) !important;
+    color: #ffffff !important;
+    box-shadow: none !important;
+    transition: background 0.25s cubic-bezier(0.16, 1, 0.3, 1), transform 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  }
+  .guide-skip:hover {
+    background: rgba(255, 255, 255, 0.16) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: none !important;
+  }
+
+  /* Smooth Keyframe Animations */
+  .hero-anim {
+    opacity: 0;
+    animation-duration: 0.95s;
+    animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+    animation-fill-mode: both;
+  }
+  .hero-reveal {
+    animation-name: heroRevealSmooth;
+  }
+  .hero-fade {
+    animation-name: heroFadeSmooth;
+  }
+  @keyframes heroRevealSmooth {
+    0% { opacity: 0; transform: translateY(24px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes heroFadeSmooth {
+    0% { opacity: 0; transform: translateY(12px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+
+  @media (max-width: 767.98px) {
+    .mobile-menu {
+      background: rgba(20, 8, 5, 0.96) !important;
+      backdrop-filter: blur(24px) !important;
+      -webkit-backdrop-filter: blur(24px) !important;
+      border: 1px solid rgba(255, 255, 255, 0.14) !important;
+      border-radius: 1rem !important;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8) !important;
+      z-index: 1002 !important;
+      padding: 0.75rem !important;
+      gap: 0.35rem !important;
+    }
+    .mobile-menu .pill {
+      padding: 0.625rem 1rem !important;
+      font-size: 0.9375rem !important;
+      text-align: left !important;
+      justify-content: flex-start !important;
+      border-radius: 8px !important;
+      display: flex !important;
+      align-items: center !important;
+      color: rgba(255, 255, 255, 0.85) !important;
+    }
+    .mobile-menu .pill:hover, .mobile-menu .pill.active {
+      background: rgba(255, 255, 255, 0.1) !important;
+      color: #ffffff !important;
+    }
+    .mobile-menu .nav-menu-btn {
+      margin-top: 0.5rem !important;
+      padding: 0.625rem !important;
+      text-align: center !important;
+      border-radius: 8px !important;
+      border: none !important;
+    }
+    .hamburger.open {
+      background: rgba(255, 255, 255, 0.16) !important;
+      border-color: transparent !important;
+    }
+    .hamburger.open .bar {
+      background: #ffffff !important;
+    }
+  }
+
+  /* Trade Panel & Dynamic Elements Theme Overrides */
+  #tern-mode-spot, #tern-mode-perp, #tern-limit-buy-mode, #tern-limit-sell-mode {
+    border-radius: 8px !important;
+    border: none !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+  #tern-mode-spot.active, #tern-mode-perp.active,
+  #tern-limit-buy-mode.active, #tern-limit-sell-mode.active {
+    background: #ff5500 !important;
+    color: #ffffff !important;
+  }
+
+  #tern-place-order-btn {
+    border-radius: 8px !important;
+    border: none !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+    background: #ff5500 !important;
+    color: #ffffff !important;
+    transition: background 0.25s cubic-bezier(0.16, 1, 0.3, 1), transform 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  }
+  #tern-place-order-btn:hover {
+    background: #e64a00 !important;
+    transform: translateY(-2px) !important;
+    box-shadow: none !important;
+  }
+
+  #tern-tutorial-pill {
+    color: #ff8800 !important;
+    border-radius: 8px !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+
+  #tern-chart-symbol-badge {
+    color: #ffaa00 !important;
+  }
+
+  #tern-tv-wrapper, #tern-tv-toolbar {
+    background: #140704 !important;
+    border-color: rgba(255, 255, 255, 0.1) !important;
+  }
+
+  [data-rk] {
+    --rk-colors-accentColor: #ff5500 !important;
+    --rk-colors-selectedOptionBorder: rgba(255, 120, 0, 0.5) !important;
+    --rk-shadows-connectButton: none !important;
+    --rk-shadows-dialog: none !important;
+    --rk-radii-connectButton: 8px !important;
+    --rk-radii-actionButton: 8px !important;
+  }
+</style>
+</head>
+<body>
+
+<!-- Navigation -->
+<nav class="nav">
+  <a class="nav-logo" href="/" style="text-decoration:none"><img src="/landing/tern-mark.png" alt="Tern" width="28" height="28">Tern</a>
+
+  <div class="nav-pills">
+    <a class="pill active" href="/radar" style="text-decoration:none">Radar</a>
+    <a class="pill" href="/trade/ETH" style="text-decoration:none">Trade</a>
+    <a class="pill" href="/portfolio" style="text-decoration:none">Portfolio</a>
+    <a class="pill" href="/yield" style="text-decoration:none">Yield</a>
+    <a class="pill" href="/theses" style="text-decoration:none">Theses</a>
+    <a class="pill" href="/recharge" style="text-decoration:none">Recharge</a>
+    <a class="pill" href="/launch" style="text-decoration:none">Launch</a>
+    <a class="pill" href="/docs" style="text-decoration:none">Docs</a>
+    <a class="pill" href="/trade/ETH?tour=1" style="text-decoration:none;color:#ff8800;font-weight:600;">Tutorial</a>
+  </div>
+
+  <div class="nav-end">
+    <a class="nav-social desktop-only" href="https://x.com/UseTern" target="_blank" rel="noopener noreferrer" aria-label="Tern on X" title="Tern on X"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></a>
+    <a class="nav-menu-btn desktop-only" href="/trade/ETH?tour=1" style="text-decoration:none">Launch app</a>
+
+    <button id="hamburger" aria-label="Toggle menu" aria-expanded="false" class="hamburger">
+      <span class="bar bar-top"></span>
+      <span class="bar bar-mid"></span>
+      <span class="bar bar-bot"></span>
+    </button>
+  </div>
+</nav>
+
+<!-- Mobile menu -->
+<div id="mobile-menu" class="mobile-menu" hidden>
+  <a class="pill" href="/radar" style="text-decoration:none">Radar</a>
+  <a class="pill active" href="/trade/ETH" style="text-decoration:none">Trade</a>
+  <a class="pill" href="/portfolio" style="text-decoration:none">Portfolio</a>
+  <a class="pill" href="/yield" style="text-decoration:none">Yield</a>
+  <a class="pill" href="/theses" style="text-decoration:none">Theses</a>
+  <a class="pill" href="/recharge" style="text-decoration:none">Recharge</a>
+  <a class="pill" href="/launch" style="text-decoration:none">Launch</a>
+  <a class="pill" href="/docs" style="text-decoration:none">Docs</a>
+  <a class="pill" href="/trade/ETH?tour=1" style="text-decoration:none;color:#ff8800;">Tutorial</a>
+  <a class="pill mobile-menu-social" href="https://x.com/UseTern" target="_blank" rel="noopener noreferrer" style="text-decoration:none"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>Follow on X</a>
+  <a class="nav-menu-btn" href="/trade/ETH?tour=1" style="text-decoration:none">Launch app</a>
+</div>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="hero-heading">
+    <h1>
+      <span class="line-1 hero-anim hero-reveal" style="animation-delay: 0.25s;">Currents that</span>
+      <span class="line-2 hero-anim hero-reveal" style="animation-delay: 0.42s;">lift &amp; compound.</span>
+    </h1>
+    <a class="hero-cta hero-anim hero-fade" style="animation-delay: 0.6s; text-decoration:none" href="/trade/ETH?tour=1">Launch app</a>
+  </div>
+
+  <div class="hero-description hero-anim hero-fade" style="animation-delay: 0.85s;">
+    <p>TERN turns LP positions into hedged, tradable, yield-bearing products on Robinhood Chain - without giving up your keys.</p>
+  </div>
+
+  <div class="hero-year hero-anim hero-fade" style="animation-delay: 1s;">
+    <span class="year-text">20-26</span>
+  </div>
+</section>
+
+<!-- First-visit guide -->
+<div class="guide" id="guide" role="dialog" aria-modal="true" aria-labelledby="guide-title" hidden>
+  <div class="guide-scrim" data-guide-cancel></div>
+  <div class="guide-sheet">
+    <div class="guide-head">
+      <h2 id="guide-title"><span class="guide-title-italic">Welcome</span> to Tern</h2>
+      <button type="button" class="guide-close" data-guide-cancel aria-label="Close">&#x2715;</button>
+    </div>
+    <video id="guide-video" class="guide-video" src="/landing/kguide.mp4" loop playsinline preload="metadata"></video>
+    <p class="guide-lede">First time here? The guide walks you through Tern page by page - Radar, Trade, Portfolio, Yield, Theses and Launch - a few things on each. Skip it and you land in the app.</p>
+    <div class="guide-actions">
+      <a class="guide-skip" href="/trade/ETH" data-guide-done>Skip guide</a>
+      <a class="guide-go" href="/trade/ETH?tour=1" data-guide-done>Launch app with tour</a>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function() {
+    const hb = document.getElementById('hamburger');
+    const mm = document.getElementById('mobile-menu');
+    if (hb && mm) {
+      function toggleLandingMenu(open) {
+        const isOpen = open !== undefined ? open : hb.classList.toggle('open');
+        if (open !== undefined) {
+          if (isOpen) hb.classList.add('open'); else hb.classList.remove('open');
+        }
+        hb.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+        if (isOpen) mm.removeAttribute('hidden'); else mm.setAttribute('hidden', '');
+      }
+      hb.onclick = (e) => {
+        e.stopPropagation();
+        toggleLandingMenu();
+      };
+      document.addEventListener('click', (e) => {
+        if (!hb.contains(e.target) && !mm.contains(e.target)) {
+          toggleLandingMenu(false);
+        }
+      });
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') toggleLandingMenu(false);
+      });
+      mm.querySelectorAll('a').forEach(a => {
+        a.addEventListener('click', () => toggleLandingMenu(false));
+      });
+      try {
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('openMenu') === '1') {
+          toggleLandingMenu(true);
+        }
+      } catch(e) {}
+    }
+  })();
+</script>
+</body>
+</html>

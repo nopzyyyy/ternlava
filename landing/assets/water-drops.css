@@ -1,0 +1,157 @@
+/* ==========================================================================
+   Clean Realistic Droplets - Zero Glow
+   ========================================================================== */
+
+.water-droplets-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 60;
+  overflow: hidden;
+}
+
+.water-drop {
+  position: absolute;
+  pointer-events: auto;
+  cursor: pointer;
+  border-radius: 50%;
+  user-select: none;
+  -webkit-user-select: none;
+  transform-origin: center center;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease;
+
+  background: 
+    radial-gradient(circle at 28% 24%, rgba(255, 255, 255, 0.9) 0%, rgba(255, 240, 210, 0.6) 12%, rgba(255, 255, 255, 0) 26%),
+    radial-gradient(circle at 65% 20%, rgba(255, 255, 255, 0.35) 0%, rgba(255, 255, 255, 0) 14%),
+    radial-gradient(ellipse at 52% 82%, rgba(255, 140, 30, 0.35) 0%, rgba(200, 60, 10, 0.18) 30%, rgba(255, 255, 255, 0.12) 50%, rgba(10, 3, 1, 0.15) 80%),
+    radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.03) 0%, rgba(255, 110, 20, 0.06) 70%, rgba(10, 3, 1, 0.25) 100%);
+
+  box-shadow:
+    inset 0 1px 2px rgba(255, 255, 255, 0.55),
+    inset 0 -2px 3px rgba(0, 0, 0, 0.45),
+    inset -1px 0 2px rgba(255, 255, 255, 0.15),
+    inset 1px 0 2px rgba(0, 0, 0, 0.25),
+    0 2px 4px rgba(0, 0, 0, 0.45);
+
+  backdrop-filter: blur(0.5px) brightness(1.12);
+  -webkit-backdrop-filter: blur(0.5px) brightness(1.12);
+}
+
+.water-drop.shape-organic-1 {
+  border-radius: 48% 52% 54% 46% / 52% 48% 52% 48%;
+}
+
+.water-drop.shape-organic-2 {
+  border-radius: 54% 46% 48% 52% / 46% 54% 46% 54%;
+}
+
+.water-drop.shape-organic-3 {
+  border-radius: 50% 50% 46% 54% / 52% 52% 48% 48%;
+}
+
+.water-drop.shape-elongated {
+  border-radius: 46% 54% 52% 48% / 38% 38% 62% 62%;
+}
+
+.water-drop.shape-bead {
+  border-radius: 50%;
+}
+
+.water-drop.size-micro {
+  width: 5px;
+  height: 5px;
+  box-shadow:
+    inset 0 0.8px 1px rgba(255, 255, 255, 0.7),
+    0 1px 2px rgba(0, 0, 0, 0.4);
+}
+
+.water-drop.size-small {
+  width: 9px;
+  height: 9px;
+}
+
+.water-drop.size-medium {
+  width: 16px;
+  height: 16px;
+}
+
+.water-drop.size-large {
+  width: 24px;
+  height: 24px;
+}
+
+.water-drop:hover {
+  transform: scale(1.12);
+}
+
+.water-drop.wobble {
+  animation: dropWobble 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.water-drop.trickling {
+  transition: top 1.8s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s ease;
+}
+
+.water-ripple {
+  position: absolute;
+  pointer-events: none;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  box-shadow: none;
+  transform: translate(-50%, -50%) scale(0.1);
+  opacity: 1;
+  animation: waterRippleExpand 0.75s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.water-splash-bead {
+  position: absolute;
+  pointer-events: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.85);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+  animation: splashBeadFly 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.water-trail {
+  position: absolute;
+  pointer-events: none;
+  width: 2px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 120, 30, 0.15) 50%, transparent 100%);
+  border-radius: 2px;
+  opacity: 0.5;
+  transition: opacity 1.5s ease-out;
+}
+
+@keyframes dropWobble {
+  0% { transform: scale(1); }
+  20% { transform: scale(1.18, 0.85) rotate(-3deg); }
+  40% { transform: scale(0.88, 1.14) rotate(2deg); }
+  60% { transform: scale(1.06, 0.95) rotate(-1deg); }
+  80% { transform: scale(0.98, 1.02) rotate(1deg); }
+  100% { transform: scale(1); }
+}
+
+@keyframes waterRippleExpand {
+  0% {
+    transform: translate(-50%, -50%) scale(0.1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(2.5);
+    opacity: 0;
+  }
+}
+
+@keyframes splashBeadFly {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(var(--dx), var(--dy)) scale(0.2);
+    opacity: 0;
+  }
+}

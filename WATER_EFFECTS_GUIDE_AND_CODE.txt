@@ -1,0 +1,1282 @@
+================================================================================
+   TERN REALISTIC WATER & WATER DROPLETS IMPLEMENTATION GUIDE & CODE
+================================================================================
+Target Project: Tern / Robinhood Chain Landing Page
+Created: 2026-09-11
+
+This document contains the complete code, architecture explanation, and exact
+step-by-step instructions so that you or any AI assistant can integrate the
+photorealistic water stream, 3D splash beads, and interactive landing page water
+droplets into the project.
+
+--------------------------------------------------------------------------------
+TABLE OF CONTENTS
+--------------------------------------------------------------------------------
+1. ARCHITECTURE OVERVIEW
+2. FILE STRUCTURE & PLACEMENT SUMMARY
+3. STEP 1: index.html (LINKING STYLES & SCRIPTS)
+4. STEP 2: landing/assets/water-drops.css (COMPLETE CODE)
+5. STEP 3: landing/assets/water-drops.js (COMPLETE CODE)
+6. STEP 4: 3D THREE.JS WATER SHADERS & DROPLET SYSTEM (COMPLETE CODE)
+   - Function jd: Core Water Body Tube & Water Surface Shader
+   - Function Zd: Instanced Fluid Streamlines & Foam Strands
+   - Function $d: Instanced 3D Water Droplets & Splash Beads System
+   - Function Kd: Main Scene, Camera, Lights, and Animation Loop
+7. STEP 5: start-server.ps1 (ZERO-DEPENDENCY LOCAL SERVER)
+8. COPY-PASTE PROMPT FOR YOUR OTHER AI ASSISTANT
+
+================================================================================
+1. ARCHITECTURE OVERVIEW
+================================================================================
+The realistic water system consists of four distinct, complementary layers:
+
+A. CORE 3D WATER BODY (jd):
+   - Geometry: Curved parametric tube along a 3D Catmull-Rom spline with UV coordinates.
+   - Vertex Shader: Multi-frequency Gerstner wave displacement (longitudinal current
+     flow + transverse swells) plus dynamic pointer wake (cursor depression +
+     expanding fluid ripple wavelets). Recomputes surface normals dynamically.
+   - Fragment Shader:
+     * Beer-Lambert absorption: Deep oceanic midnight abyss (#030e28) to rich ocean
+       blue (#0760a0) to vibrant Caribbean turquoise (#0cd4f5) to crystal crests (#e0f7ff).
+     * Physical Fresnel reflectance (Schlick approximation for water n=1.333).
+     * Dancing aquatic caustics: Dual overlapping animated wave interference patterns.
+     * Sun specular glints & microfacet sparkles catching directional sunlight.
+     * Organic wave crest foam and whitecaps.
+
+B. 3D FLUID STREAMLINES & FOAM CURRENTS (Zd):
+   - 140,000 instanced ribbons along the spline with dynamic caustics, wave
+     propagation, and fluid wake parting on pointer interaction.
+
+C. 3D SUSPENDED WATER DROPLETS & SPLASH BEADS ($d):
+   - 550+ 3D droplets floating and bobbing in the airspace along the water current.
+   - Mathematical Ray-Sphere Intersection: Rendered on camera-facing billboard quads
+     with analytical spherical normals for 100% smooth spherical curvature, zero polygon
+     edges, diamond sun specular glints, bottom caustic glow, and pointer splash explosions.
+
+D. SCREEN-SPACE & LANDING PAGE WATER DROPS (water-drops.js & water-drops.css):
+   - Real-world optical lighting model:
+     * Dual specular highlights: Sharp pinpoint sun glint at top-left + soft rim fill.
+     * Internal refractive caustic glow at bottom edge.
+     * Directional contact shadows and ambient occlusion.
+     * Subtle backdrop-filter lens refraction and magnification.
+   - Natural clustering around Hero title ("Currents that lift & compound"), glass
+     navigation pills, and viewport edges.
+   - Physics: Surface tension elastic wobble on hover, click splash ripples with
+     flying micro-beads, and organic gravity trickling with evaporating wet trails.
+
+================================================================================
+2. FILE STRUCTURE & PLACEMENT SUMMARY
+================================================================================
+Your project directory should have these files:
+
+project-root/
+├── index.html                    <-- Add links to water-drops.css and water-drops.js
+├── landing/
+│   └── assets/
+│       ├── index-D5smcTan.js     <-- Contains Three.js + updated jd, Zd, $d, Kd
+│       ├── water-drops.css       <-- [NEW FILE] Droplet optical styles & animations
+│       └── water-drops.js        <-- [NEW FILE] Interactive water droplet engine
+└── start-server.ps1              <-- [NEW FILE] Clean-URL server on localhost:3000
+
+================================================================================
+3. STEP 1: index.html (LINKING STYLES & SCRIPTS)
+================================================================================
+Inside the <head> section of `index.html`, add the stylesheet and script tags:
+
+```html
+<!-- Inside <head> of index.html -->
+<link rel="stylesheet" href="/landing/assets/water-drops.css">
+<script type="module" src="/landing/assets/water-drops.js"></script>
+```
+
+Make sure the main Three.js bundle is also referenced as a module:
+```html
+<script type="module" crossorigin src="/landing/assets/index-D5smcTan.js"></script>
+<link rel="stylesheet" crossorigin href="/landing/assets/index-BxnWH-st.css">
+```
+
+================================================================================
+4. STEP 2: landing/assets/water-drops.css (COMPLETE CODE)
+================================================================================
+Save the following CSS to: `landing/assets/water-drops.css`
+
+```css
+/* ==========================================================================
+   Photorealistic Water Droplets & Liquid Glass Condensation Optics
+   ========================================================================== */
+
+.water-droplets-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 60;
+  overflow: hidden;
+}
+
+/* Base Realistic Water Droplet */
+.water-drop {
+  position: absolute;
+  pointer-events: auto;
+  cursor: pointer;
+  border-radius: 50%;
+  user-select: none;
+  -webkit-user-select: none;
+  transform-origin: center center;
+  transition: transform 0.15s cubic-bezier(0.2, 0.9, 0.3, 1.4), opacity 0.4s ease;
+
+  /* Optical Glass & Liquid Physics */
+  background: 
+    /* Primary Sharp Sun Specular Glint (Top-Left) */
+    radial-gradient(circle at 28% 24%, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.75) 12%, rgba(255, 255, 255, 0) 28%),
+    /* Secondary Soft Specular Pinpoint */
+    radial-gradient(circle at 65% 20%, rgba(255, 255, 255, 0.45) 0%, rgba(255, 255, 255, 0) 16%),
+    /* Internal Refractive Caustic Glow (Bottom Interior) */
+    radial-gradient(ellipse at 52% 82%, rgba(56, 189, 248, 0.5) 0%, rgba(14, 165, 233, 0.3) 25%, rgba(255, 255, 255, 0.18) 45%, rgba(4, 25, 55, 0.1) 75%),
+    /* Ambient Water Body Core */
+    radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.04) 0%, rgba(14, 165, 233, 0.08) 70%, rgba(2, 10, 24, 0.25) 100%);
+
+  /* Dual Layer Drop Shadow & Ambient Occlusion */
+  box-shadow:
+    inset 0 1.5px 2px rgba(255, 255, 255, 0.65),
+    inset 0 -2px 3px rgba(4, 25, 55, 0.4),
+    inset -1px 0 2px rgba(255, 255, 255, 0.2),
+    inset 1px 0 2px rgba(0, 0, 0, 0.25),
+    0 2px 5px rgba(0, 0, 0, 0.45),
+    0 4px 12px rgba(0, 15, 40, 0.35);
+
+  /* Subtle Refractive Lens Magnification */
+  backdrop-filter: blur(0.6px) brightness(1.18) contrast(1.06);
+  -webkit-backdrop-filter: blur(0.6px) brightness(1.18) contrast(1.06);
+}
+
+/* Organic Asymmetric Shapes (Surface Tension Irregularities) */
+.water-drop.shape-organic-1 {
+  border-radius: 48% 52% 54% 46% / 52% 48% 52% 48%;
+}
+
+.water-drop.shape-organic-2 {
+  border-radius: 54% 46% 48% 52% / 46% 54% 46% 54%;
+}
+
+.water-drop.shape-organic-3 {
+  border-radius: 50% 50% 46% 54% / 52% 52% 48% 48%;
+}
+
+.water-drop.shape-elongated {
+  border-radius: 46% 54% 52% 48% / 38% 38% 62% 62%;
+}
+
+.water-drop.shape-bead {
+  border-radius: 50%;
+}
+
+/* Micro Droplets (Condensed Mist / Dew Beads) */
+.water-drop.size-micro {
+  width: 5px;
+  height: 5px;
+  box-shadow:
+    inset 0 0.8px 1px rgba(255, 255, 255, 0.8),
+    0 1px 2px rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(0.3px) brightness(1.2);
+  -webkit-backdrop-filter: blur(0.3px) brightness(1.2);
+}
+
+.water-drop.size-small {
+  width: 9px;
+  height: 9px;
+}
+
+.water-drop.size-medium {
+  width: 16px;
+  height: 16px;
+}
+
+.water-drop.size-large {
+  width: 24px;
+  height: 24px;
+}
+
+.water-drop.size-xlarge {
+  width: 34px;
+  height: 34px;
+}
+
+/* Interactive Hover & Wobble Physics */
+.water-drop:hover {
+  transform: scale(1.12);
+  filter: brightness(1.15);
+}
+
+.water-drop.wobble {
+  animation: dropWobble 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.water-drop.trickling {
+  transition: top 1.8s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s ease;
+}
+
+/* Liquid Ripple Effect on Tap / Click */
+.water-ripple {
+  position: absolute;
+  pointer-events: none;
+  border-radius: 50%;
+  border: 1.5px solid rgba(56, 189, 248, 0.65);
+  box-shadow: 0 0 12px rgba(14, 165, 233, 0.45);
+  transform: translate(-50%, -50%) scale(0.1);
+  opacity: 1;
+  animation: waterRippleExpand 0.75s cubic-bezier(0.1, 0.7, 0.3, 1) forwards;
+}
+
+.water-splash-bead {
+  position: absolute;
+  pointer-events: none;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #ffffff 0%, rgba(56, 189, 248, 0.9) 50%, rgba(2, 132, 199, 0.6) 100%);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
+  animation: splashBeadFly 0.6s ease-out forwards;
+}
+
+/* Wet condensation trail behind trickling drops */
+.water-trail {
+  position: absolute;
+  pointer-events: none;
+  width: 2px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.3) 0%, rgba(56, 189, 248, 0.2) 50%, transparent 100%);
+  border-radius: 2px;
+  opacity: 0.7;
+  transition: opacity 1.5s ease-out;
+}
+
+/* Keyframe Animations */
+@keyframes dropWobble {
+  0%   { transform: scale(1, 1); }
+  25%  { transform: scale(1.22, 0.82) rotate(-4deg); }
+  50%  { transform: scale(0.85, 1.18) rotate(3deg); }
+  75%  { transform: scale(1.08, 0.94) rotate(-1deg); }
+  100% { transform: scale(1, 1) rotate(0deg); }
+}
+
+@keyframes waterRippleExpand {
+  0% {
+    transform: translate(-50%, -50%) scale(0.1);
+    opacity: 0.95;
+    border-width: 2.5px;
+  }
+  60% {
+    opacity: 0.6;
+    border-width: 1.5px;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(2.8);
+    opacity: 0;
+    border-width: 0.5px;
+  }
+}
+
+@keyframes splashBeadFly {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(var(--dx), var(--dy)) scale(0.3);
+    opacity: 0;
+  }
+}
+
+/* Floating Mist / Spray Ambient Particles */
+.ambient-mist-particle {
+  position: absolute;
+  pointer-events: none;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(224, 242, 254, 0.7) 0%, rgba(56, 189, 248, 0.25) 45%, transparent 70%);
+  filter: blur(1.5px);
+  animation: mistFloat 8s ease-in-out infinite;
+}
+
+@keyframes mistFloat {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0.35;
+  }
+  50% {
+    transform: translate(12px, -18px) scale(1.15);
+    opacity: 0.7;
+  }
+}
+```
+
+================================================================================
+5. STEP 3: landing/assets/water-drops.js (COMPLETE CODE)
+================================================================================
+Save the following JavaScript to: `landing/assets/water-drops.js`
+
+```javascript
+/**
+ * Photorealistic Interactive Water Droplets & Liquid Condensation System
+ */
+(function () {
+  'use strict';
+
+  function initWaterDroplets() {
+    const container = document.createElement('div');
+    container.className = 'water-droplets-container';
+    container.id = 'water-droplets-root';
+    document.body.appendChild(container);
+
+    const shapes = ['shape-organic-1', 'shape-organic-2', 'shape-organic-3', 'shape-elongated', 'shape-bead'];
+    const sizes = ['size-micro', 'size-small', 'size-medium', 'size-large'];
+
+    function createDrop(x, y, sizeClass, shapeClass, options = {}) {
+      const drop = document.createElement('div');
+      drop.className = `water-drop ${sizeClass || 'size-small'} ${shapeClass || 'shape-organic-1'}`;
+      drop.style.left = `${x}px`;
+      drop.style.top = `${y}px`;
+
+      if (options.rotation) {
+        drop.style.transform = `rotate(${options.rotation}deg)`;
+      }
+
+      drop.addEventListener('mouseenter', () => {
+        triggerWobble(drop);
+      });
+
+      drop.addEventListener('click', (e) => {
+        e.stopPropagation();
+        triggerSplash(e.clientX, e.clientY);
+        triggerWobble(drop);
+      });
+
+      container.appendChild(drop);
+      return drop;
+    }
+
+    function triggerWobble(drop) {
+      drop.classList.remove('wobble');
+      void drop.offsetWidth;
+      drop.classList.add('wobble');
+    }
+
+    function triggerSplash(x, y) {
+      const ripple = document.createElement('div');
+      ripple.className = 'water-ripple';
+      ripple.style.left = `${x}px`;
+      ripple.style.top = `${y}px`;
+      ripple.style.width = '50px';
+      ripple.style.height = '50px';
+      container.appendChild(ripple);
+      setTimeout(() => ripple.remove(), 800);
+
+      const beadCount = 6;
+      for (let i = 0; i < beadCount; i++) {
+        const bead = document.createElement('div');
+        bead.className = 'water-splash-bead';
+        const size = Math.random() * 4 + 2;
+        bead.style.width = `${size}px`;
+        bead.style.height = `${size}px`;
+        bead.style.left = `${x}px`;
+        bead.style.top = `${y}px`;
+
+        const angle = (i / beadCount) * Math.PI * 2 + (Math.random() - 0.5) * 0.5;
+        const dist = Math.random() * 32 + 18;
+        const dx = Math.cos(angle) * dist;
+        const dy = Math.sin(angle) * dist;
+
+        bead.style.setProperty('--dx', `${dx}px`);
+        bead.style.setProperty('--dy', `${dy}px`);
+        container.appendChild(bead);
+        setTimeout(() => bead.remove(), 600);
+      }
+    }
+
+    function spawnCluster(centerX, centerY, radiusX, radiusY, count) {
+      for (let i = 0; i < count; i++) {
+        const u = Math.random();
+        const v = Math.random();
+        const rX = (u - 0.5) * 2 * radiusX;
+        const rY = (v - 0.5) * 2 * radiusY;
+        const x = Math.max(10, Math.min(window.innerWidth - 30, centerX + rX));
+        const y = Math.max(10, Math.min(window.innerHeight - 30, centerY + rY));
+
+        let size = 'size-micro';
+        const rand = Math.random();
+        if (rand > 0.85) size = 'size-large';
+        else if (rand > 0.6) size = 'size-medium';
+        else if (rand > 0.3) size = 'size-small';
+
+        const shape = shapes[Math.floor(Math.random() * shapes.length)];
+        const rot = Math.floor(Math.random() * 360);
+        createDrop(x, y, size, shape, { rotation: rot });
+      }
+    }
+
+    function layoutDroplets() {
+      container.innerHTML = '';
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+
+      // 1. Cluster around Hero Heading
+      const heroHeading = document.querySelector('.hero-heading');
+      if (heroHeading) {
+        const rect = heroHeading.getBoundingClientRect();
+        spawnCluster(rect.left + rect.width * 0.22, rect.top + rect.height * 0.45, 90, 45, 14);
+        spawnCluster(rect.left + rect.width * 0.78, rect.top + rect.height * 0.65, 80, 40, 12);
+        spawnCluster(rect.left + rect.width * 0.50, rect.top + rect.height * 0.15, 120, 25, 10);
+      } else {
+        spawnCluster(w * 0.5, h * 0.32, 260, 90, 30);
+      }
+
+      // 2. Dew beads on the Navigation Bar glass pills
+      const navPills = document.querySelector('.nav-pills');
+      if (navPills) {
+        const rect = navPills.getBoundingClientRect();
+        createDrop(rect.left + 8, rect.top - 3, 'size-small', 'shape-bead');
+        createDrop(rect.left + 24, rect.bottom - 4, 'size-micro', 'shape-bead');
+        createDrop(rect.right - 18, rect.top - 2, 'size-small', 'shape-organic-1');
+        createDrop(rect.right - 38, rect.bottom - 3, 'size-micro', 'shape-bead');
+      }
+
+      // 3. Dew drops resting around the Hero CTA button
+      const heroCta = document.querySelector('.hero-cta');
+      if (heroCta) {
+        const rect = heroCta.getBoundingClientRect();
+        createDrop(rect.right + 12, rect.top + 8, 'size-medium', 'shape-organic-2');
+        createDrop(rect.right + 26, rect.top + 22, 'size-micro', 'shape-bead');
+        createDrop(rect.left - 14, rect.bottom - 6, 'size-small', 'shape-organic-3');
+      }
+
+      // 4. Natural perimeter condensation beads
+      spawnCluster(w * 0.08, h * 0.12, 60, 50, 8);
+      spawnCluster(w * 0.92, h * 0.14, 70, 55, 9);
+      spawnCluster(w * 0.04, h * 0.52, 40, 90, 10);
+      spawnCluster(w * 0.95, h * 0.58, 40, 110, 12);
+      spawnCluster(w * 0.15, h * 0.88, 80, 45, 10);
+      spawnCluster(w * 0.82, h * 0.86, 90, 50, 11);
+
+      // 5. Ambient floating mist particles
+      for (let i = 0; i < 14; i++) {
+        const mist = document.createElement('div');
+        mist.className = 'ambient-mist-particle';
+        const mSize = Math.random() * 8 + 4;
+        mist.style.width = `${mSize}px`;
+        mist.style.height = `${mSize}px`;
+        mist.style.left = `${Math.random() * w}px`;
+        mist.style.top = `${Math.random() * h}px`;
+        mist.style.animationDelay = `${(Math.random() * 6).toFixed(1)}s`;
+        mist.style.animationDuration = `${(Math.random() * 5 + 6).toFixed(1)}s`;
+        container.appendChild(mist);
+      }
+    }
+
+    // Spawn water drop on clicking empty space
+    document.addEventListener('click', (e) => {
+      if (e.target.closest('a, button, input, [role="dialog"], .guide-sheet')) return;
+      triggerSplash(e.clientX, e.clientY);
+      const size = Math.random() > 0.5 ? 'size-small' : 'size-medium';
+      const shape = shapes[Math.floor(Math.random() * shapes.length)];
+      const drop = createDrop(e.clientX - 8, e.clientY - 8, size, shape);
+      drop.style.transform = 'scale(0)';
+      setTimeout(() => {
+        drop.style.transform = 'scale(1)';
+        triggerWobble(drop);
+      }, 10);
+    });
+
+    // Gentle gravity trickling
+    function scheduleTrickle() {
+      const drops = container.querySelectorAll('.water-drop.size-large, .water-drop.size-medium');
+      if (drops.length > 0) {
+        const randomDrop = drops[Math.floor(Math.random() * drops.length)];
+        if (randomDrop && !randomDrop.classList.contains('trickling')) {
+          randomDrop.classList.add('trickling');
+          const currentTop = parseFloat(randomDrop.style.top) || 100;
+          const currentLeft = parseFloat(randomDrop.style.left) || 100;
+          const distance = Math.floor(Math.random() * 24 + 12);
+
+          const trail = document.createElement('div');
+          trail.className = 'water-trail';
+          trail.style.left = `${currentLeft + 7}px`;
+          trail.style.top = `${currentTop + 4}px`;
+          trail.style.height = `${distance}px`;
+          container.appendChild(trail);
+          setTimeout(() => {
+            trail.style.opacity = '0';
+            setTimeout(() => trail.remove(), 1600);
+          }, 600);
+
+          randomDrop.style.top = `${currentTop + distance}px`;
+          randomDrop.classList.add('shape-elongated');
+
+          setTimeout(() => {
+            randomDrop.classList.remove('trickling');
+            triggerWobble(randomDrop);
+          }, 1800);
+        }
+      }
+      setTimeout(scheduleTrickle, Math.random() * 5000 + 4000);
+    }
+
+    layoutDroplets();
+    setTimeout(scheduleTrickle, 3000);
+
+    let resizeTimer;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(layoutDroplets, 250);
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initWaterDroplets);
+  } else {
+    initWaterDroplets();
+  }
+})();
+```
+
+================================================================================
+6. STEP 4: 3D THREE.JS WATER SHADERS & DROPLET SYSTEM (COMPLETE CODE)
+================================================================================
+In `landing/assets/index-D5smcTan.js` (or your Three.js main script):
+Replace the functions starting from `function Yd` through `Kd()` with the code below.
+
+NOTE on Three.js Minified Identifiers:
+- `Vt` = THREE.BufferGeometry
+- `Et` = THREE.BufferAttribute
+- `Wd` = THREE.InstancedBufferGeometry
+- `ci` = THREE.InstancedBufferAttribute
+- `un` = THREE.ShaderMaterial
+- `Dt` = THREE.Mesh
+- `So` = THREE.WebGLRenderer
+- `Id` = THREE.Scene
+- `Ct` = THREE.PerspectiveCamera
+- `kd` = THREE.AmbientLight
+- `Vd` = THREE.DirectionalLight
+- `Bd` = THREE.CatmullRomCurve3
+- `P`  = THREE.Vector3
+- `ze` = THREE.Vector2
+- `Lt` = THREE.DoubleSide
+- `ka` = THREE.ACESFilmicToneMapping
+- `nt` = THREE.SRGBColorSpace
+- `qd` = THREE.Raycaster
+- `Xd` = THREE.Clock
+
+Here is the exact code:
+
+```javascript
+function Yd({attack:i=12,release:e=5.5,follow:t=9.2,snapBelow:n=.02}={}){
+  let r=0,s=0;
+  const o={x:9999,y:9999,z:9999};
+  return{
+    update(a,l){
+      const c=r<n,u=l?1:0,d=l?i:e;
+      if(s+=(-d*d*(r-u)-2*d*s)*a,r+=s*a,r>=1&&(r=1,s=0),(r<=0||!l&&r<.001)&&(r=0,s=0),l)
+        if(c)o.x=l.x,o.y=l.y,o.z=l.z;
+        else{const f=1-Math.exp(-t*a);o.x+=(l.x-o.x)*f,o.y+=(l.y-o.y)*f,o.z+=(l.z-o.z)*f}
+      return{strength:r,x:o.x,y:o.y,z:o.z}
+    }
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Core Water Body Tube & Water Surface Shader
+// -----------------------------------------------------------------------------
+function jd(i, e, t, n, r) {
+  const a = [], l = [], uvs = [], c = [];
+  for (let f = 0; f <= 220; f++) {
+    const uCoord = f / 220;
+    const { P: m, B: g, N: _ } = r(uCoord);
+    for (let p = 0; p <= 28; p++) {
+      const vCoord = p / 28;
+      const h = vCoord * Math.PI * 2, A = Math.cos(h), S = Math.sin(h);
+      a.push(m.x + _.x * t * A + g.x * n * S, m.y + _.y * t * A + g.y * n * S, m.z + _.z * t * A + g.z * n * S);
+      const T = _.x * A / t + g.x * S / n, C = _.y * A / t + g.y * S / n, w = _.z * A / t + g.z * n * S, b = Math.hypot(T, C, w);
+      l.push(T / b, C / b, w / b);
+      uvs.push(uCoord, vCoord);
+    }
+  }
+  for (let f = 0; f < 220; f++)
+    for (let m = 0; m < 28; m++) {
+      const g = f * 29 + m, _ = g + 28 + 1;
+      c.push(g, _, g + 1, _, _ + 1, g + 1);
+    }
+  const u = new Vt;
+  u.setAttribute("position", new Et(a, 3));
+  u.setAttribute("normal", new Et(l, 3));
+  u.setAttribute("uv", new Et(uvs, 2));
+  u.setIndex(c);
+
+  const waterUniforms = {
+    uTime: { value: 0 },
+    uMouse: { value: new P(9999, 9999, 9999) },
+    uPush: { value: 0 }
+  };
+
+  const waterMat = new un({
+    uniforms: waterUniforms,
+    side: Lt,
+    transparent: true,
+    depthWrite: true,
+    vertexShader: `
+      uniform float uTime;
+      uniform vec3 uMouse;
+      uniform float uPush;
+      varying vec2 vUv;
+      varying vec3 vNormal;
+      varying vec3 vWorldPos;
+      varying vec3 vViewPos;
+      varying float vWave;
+
+      void main() {
+        vUv = uv;
+        vec3 pos = position;
+        vec3 nrm = normalize(normal);
+
+        // Multi-frequency liquid flow along current (uv.x) + transverse swells (uv.y)
+        float flow = uv.x * 24.0 - uTime * 3.4;
+        float swirl = uv.y * 10.0 + uTime * 1.8;
+
+        float w1 = sin(flow) * cos(swirl * 0.8) * 0.07;
+        float w2 = sin(flow * 2.4 + swirl * 1.3) * 0.038;
+        float w3 = cos(flow * 4.8 - uTime * 3.0) * sin(swirl * 2.2) * 0.02;
+        float w4 = sin(pos.x * 2.8 + pos.z * 3.8 - uTime * 4.2) * 0.025;
+        float totalWave = w1 + w2 + w3 + w4;
+
+        // Pointer wake & radial fluid depression
+        vec3 toM = pos - uMouse;
+        float dist = length(toM);
+        float wake = smoothstep(2.6, 0.0, dist) * uPush;
+        totalWave += sin(dist * 14.0 - uTime * 7.5) * wake * 0.14;
+        totalWave -= wake * 0.09;
+
+        pos += nrm * totalWave;
+        vWave = totalWave;
+
+        // Dynamic normal perturbation for glistening wave facets
+        float dU = cos(flow) * 0.07 * 24.0 + cos(flow * 2.4) * 0.038 * 2.4;
+        vec3 perturbedN = normalize(nrm + vec3(dU * 0.3, totalWave * 0.6, -dU * 0.25));
+
+        vNormal = normalize(normalMatrix * perturbedN);
+        vec4 worldP = modelMatrix * vec4(pos, 1.0);
+        vWorldPos = worldP.xyz;
+        vec4 mvPos = modelViewMatrix * vec4(pos, 1.0);
+        vViewPos = -mvPos.xyz;
+        gl_Position = projectionMatrix * mvPos;
+      }
+    `,
+    fragmentShader: `
+      precision highp float;
+      uniform float uTime;
+      varying vec2 vUv;
+      varying vec3 vNormal;
+      varying vec3 vWorldPos;
+      varying vec3 vViewPos;
+      varying float vWave;
+
+      void main() {
+        vec3 N = normalize(vNormal);
+        vec3 V = normalize(vViewPos);
+        vec3 L = normalize(vec3(-0.45, 0.85, 0.4));
+        vec3 H = normalize(L + V);
+
+        // 1. Deep Ocean Absorption & Subsurface Scattering Colors
+        vec3 deepAbyss = vec3(0.012, 0.045, 0.16);
+        vec3 oceanMid  = vec3(0.028, 0.38, 0.72);
+        vec3 cyanShallow = vec3(0.08, 0.78, 0.98);
+        vec3 crestGlint = vec3(0.88, 0.97, 1.0);
+
+        // Fresnel reflection (Schlick approximation)
+        float NdotV = max(dot(N, V), 0.0);
+        float fresnel = 0.035 + 0.965 * pow(1.0 - NdotV, 4.0);
+
+        // Depth modulation from wave displacement
+        float depthF = clamp((vWave + 0.08) / 0.16, 0.0, 1.0);
+        vec3 waterCol = mix(deepAbyss, oceanMid, smoothstep(0.04, 0.52, depthF));
+        waterCol = mix(waterCol, cyanShallow, smoothstep(0.42, 0.88, depthF));
+
+        // 2. High-Fidelity Dancing Aquatic Caustics
+        vec2 cUv1 = vUv * vec2(28.0, 14.0) + vec2(-uTime * 0.55, uTime * 0.25);
+        vec2 cUv2 = vUv * vec2(22.0, 18.0) + vec2(uTime * 0.45, -uTime * 0.35);
+        float c1 = sin(cUv1.x + cos(cUv1.y * 1.5)) * sin(cUv1.y + sin(cUv1.x * 1.2));
+        float c2 = cos(cUv2.x + sin(cUv2.y * 1.3)) * cos(cUv2.y + cos(cUv2.x * 1.1));
+        float caustic = pow(clamp((c1 + c2) * 0.5 + 0.5, 0.0, 1.0), 2.8);
+        waterCol += cyanShallow * caustic * 0.42;
+
+        // 3. Sun Specular Highlights (Microfacet Glints)
+        float NdotH = max(dot(N, H), 0.0);
+        float spec = pow(NdotH, 52.0);
+        float sparkle = pow(NdotH, 180.0) * (0.65 + 0.35 * sin(uTime * 14.0 + vWorldPos.x * 22.0 + vWorldPos.z * 16.0));
+        vec3 sunGlint = crestGlint * (spec * 1.3 + sparkle * 2.6);
+
+        // 4. Foam / Aeration on Wave Crests
+        float foamNoise = sin(vUv.x * 85.0 - uTime * 6.5) * cos(vUv.y * 45.0 + uTime * 4.5);
+        float foam = smoothstep(0.05, 0.10, vWave + foamNoise * 0.025);
+        vec3 foamCol = crestGlint * foam * 0.75;
+
+        // Composite
+        vec3 finalCol = mix(waterCol, crestGlint * 0.82, fresnel * 0.65);
+        finalCol += sunGlint + foamCol;
+
+        float alpha = clamp(0.88 + fresnel * 0.12, 0.85, 0.98);
+        gl_FragColor = vec4(finalCol, alpha);
+        #include <tonemapping_fragment>
+        #include <colorspace_fragment>
+      }
+    `
+  });
+
+  const d = new Dt(u, waterMat);
+  i.add(d);
+  return { mesh: d, uniforms: waterUniforms };
+}
+
+// -----------------------------------------------------------------------------
+// Instanced Fluid Streamlines & Foam Strands
+// -----------------------------------------------------------------------------
+function Zd(i, e, t, n, r, s) {
+  const l = new Wd, c = [], u = [], d = [];
+  for (let S = 0; S <= 3; S++) {
+    const T = S / 3, C = 0.5 * (1 - T * T);
+    c.push(-C, T, 0, C, T, 0), u.push(0, T, 1, T);
+  }
+  c[c.length - 6] = 0, c[c.length - 3] = 0;
+  for (let S = 0; S < 3; S++) {
+    const T = S * 2, C = T + 1, w = T + 2, b = T + 3;
+    d.push(T, C, w, C, b, w);
+  }
+  l.setAttribute("position", new Et(c, 3)), l.setAttribute("uv", new Et(u, 2)), l.setIndex(d);
+  const f = new Float32Array(14e4 * 3), m = new Float32Array(14e4 * 3), g = new Float32Array(14e4 * 4);
+  let _ = 0;
+  for (; _ < 14e4;) {
+    const S = Math.random(), T = Math.random() * Math.PI * 2, C = Math.cos(T), w = Math.sin(T), b = Math.max(C, 0);
+    if (Math.random() > 0.3 + 0.7 * b) continue;
+    const { P: k, B: x, N: y } = r(S);
+    f[_ * 3] = k.x + y.x * t * C + x.x * n * w;
+    f[_ * 3 + 1] = k.y + y.y * t * C + x.y * n * w;
+    f[_ * 3 + 2] = k.z + y.z * t * C + x.z * n * w;
+    let z = y.x * C / t + x.x * w / n, G = y.y * C / t + x.y * w / n, Z = y.z * C / t + x.z * w / n;
+    const L = Math.hypot(z, G, Z);
+    m[_ * 3] = z / L, m[_ * 3 + 1] = G / L, m[_ * 3 + 2] = Z / L;
+    g[_ * 4] = Math.random() * Math.PI * 2;
+    g[_ * 4 + 1] = (0.18 + 0.5 * b * b) * (0.6 + 0.8 * Math.random());
+    g[_ * 4 + 2] = (Math.random() - 0.5) * 0.7;
+    g[_ * 4 + 3] = Math.random();
+    _++;
+  }
+  l.setAttribute("offset", new ci(f, 3)), l.setAttribute("nrm", new ci(m, 3)), l.setAttribute("rand", new ci(g, 4)), l.instanceCount = 14e4;
+  const p = {
+    uTime: { value: 0 },
+    uMouse: { value: new P(9999, 9999, 9999) },
+    uMouseR: { value: 2 },
+    uPush: { value: 0 }
+  };
+  const h = new un({
+    uniforms: p,
+    side: Lt,
+    vertexShader: `
+      attribute vec3 offset;
+      attribute vec3 nrm;
+      attribute vec4 rand;
+      uniform float uTime;
+      uniform vec3 uMouse;
+      uniform float uMouseR;
+      uniform float uPush;
+      varying float vT;
+      varying float vShade;
+      varying float vDark;
+      varying vec3 vWorld;
+      varying vec4 vRand;
+
+      void main() {
+        float t = uv.y;
+        vT = t;
+        vRand = rand;
+        float len = rand.y;
+
+        vec3 ref = abs(nrm.y) < 0.95 ? vec3(0.0, 1.0, 0.0) : vec3(1.0, 0.0, 0.0);
+        vec3 T0 = normalize(cross(nrm, ref));
+        vec3 B0 = cross(nrm, T0);
+        float ca = cos(rand.x), sa = sin(rand.x);
+        vec3 widthDir = T0 * ca + B0 * sa;
+        vec3 leanDir  = T0 * -sa + B0 * ca;
+
+        float bend = t * t;
+
+        float wave1 = sin(uTime * 2.8 + offset.x * 1.5 + offset.y * 1.2 + rand.x * 2.0) * 0.16;
+        float wave2 = cos(uTime * 2.0 + offset.x * 0.8 + offset.z * 1.4) * 0.10;
+        float wave3 = sin(uTime * 3.8 + offset.x * 2.4 + rand.z * 3.0) * 0.06;
+        float wave = wave1 + wave2 + wave3;
+
+        vec3 world = offset
+                   + nrm * (t * len * 0.9 + sin(uTime * 3.2 + rand.x * 4.0) * 0.03 * t)
+                   + widthDir * (position.x * 0.036)
+                   + leanDir * (rand.z * 0.28 * len) * bend
+                   + (T0 * wave + B0 * wave * 0.75) * bend * len * 2.6;
+
+        vec3 toB = offset - uMouse;
+        float d = length(toB);
+        float infl = smoothstep(uMouseR, 0.0, d);
+        infl *= infl;
+        vec3 pushDir = toB - nrm * dot(toB, nrm);
+        float pl = length(pushDir);
+        pushDir = pl > 0.0001 ? pushDir / pl : T0;
+        infl *= uPush;
+
+        world += pushDir * infl * bend * (0.42 + len * 2.8);
+        world -= nrm * infl * bend * len * 0.95;
+        world += nrm * sin(d * 14.0 - uTime * 6.5) * infl * 0.10 * bend;
+
+        vDark = infl;
+        vWorld = world;
+
+        vShade = (0.75 + 0.25 * rand.w) * (0.85 + 0.15 * sin(rand.x * 2.0));
+        vShade *= 0.6 + 0.4 * clamp(nrm.y * 0.5 + 0.6, 0.0, 1.0);
+
+        gl_Position = projectionMatrix * modelViewMatrix * vec4(world, 1.0);
+      }
+    `,
+    fragmentShader: `
+      precision highp float;
+      uniform float uTime;
+      varying float vT;
+      varying float vShade;
+      varying float vDark;
+      varying vec3 vWorld;
+      varying vec4 vRand;
+
+      void main() {
+        vec3 deepSea   = vec3(0.015, 0.06, 0.20);
+        vec3 oceanMid  = vec3(0.03, 0.42, 0.78);
+        vec3 cyanFlow  = vec3(0.08, 0.82, 0.98);
+        vec3 foamGlint = vec3(0.92, 0.98, 1.00);
+
+        float t = vT;
+        vec3 col = mix(deepSea, oceanMid, smoothstep(0.0, 0.52, t));
+        col = mix(col, cyanFlow, smoothstep(0.42, 0.86, t));
+        col = mix(col, foamGlint, smoothstep(0.82, 1.0, t));
+
+        float c1 = sin(vWorld.x * 6.5 + vWorld.y * 5.0 + uTime * 3.0);
+        float c2 = cos(vWorld.z * 7.0 - vWorld.x * 3.8 + uTime * 3.6);
+        float caustics = pow(clamp((c1 + c2) * 0.5 + 0.5, 0.0, 1.0), 2.8);
+        col += cyanFlow * caustics * 0.4 * (0.2 + 0.8 * t);
+
+        float spray = pow(t, 2.4) * (0.4 + 0.6 * sin(uTime * 6.0 + vWorld.x * 16.0 + vRand.x * 6.0));
+        col += foamGlint * spray * 0.55;
+
+        col += cyanFlow * (vDark * 0.65);
+
+        col *= vShade;
+        gl_FragColor = vec4(col, 1.0);
+        #include <tonemapping_fragment>
+        #include <colorspace_fragment>
+      }
+    `
+  });
+  const A = new Dt(l, h);
+  A.frustumCulled = false;
+  i.add(A);
+  return { uniforms: p };
+}
+
+// -----------------------------------------------------------------------------
+// Instanced 3D Water Droplets & Splash Beads System
+// -----------------------------------------------------------------------------
+function $d(scene, camera, curve, radX, radY, frameFn, upVec) {
+  const DROPLET_COUNT = 550;
+  const geom = new Wd();
+  const pos = [-0.5, -0.5, 0,  0.5, -0.5, 0,  0.5, 0.5, 0,  -0.5, 0.5, 0];
+  const uvs = [0, 0,  1, 0,  1, 1,  0, 1];
+  const idx = [0, 1, 2,  0, 2, 3];
+  geom.setAttribute("position", new Et(pos, 3));
+  geom.setAttribute("uv", new Et(uvs, 2));
+  geom.setIndex(idx);
+
+  const offsets = new Float32Array(DROPLET_COUNT * 3);
+  const initialData = new Float32Array(DROPLET_COUNT * 4);
+
+  for (let i = 0; i < DROPLET_COUNT; i++) {
+    const t = Math.random();
+    const angle = Math.random() * Math.PI * 2;
+    const radial = 1.08 + Math.random() * 0.85;
+    const scale = 0.07 + Math.random() * 0.14;
+
+    const { P: pt, B: binorm, N: norm } = frameFn(t);
+    const cosA = Math.cos(angle), sinA = Math.sin(angle);
+    offsets[i * 3]     = pt.x + norm.x * radX * cosA * radial + binorm.x * radY * sinA * radial;
+    offsets[i * 3 + 1] = pt.y + norm.y * radX * cosA * radial + binorm.y * radY * sinA * radial;
+    offsets[i * 3 + 2] = pt.z + norm.z * radX * cosA * radial + binorm.z * radY * sinA * radial;
+
+    initialData[i * 4]     = t;
+    initialData[i * 4 + 1] = angle;
+    initialData[i * 4 + 2] = radial;
+    initialData[i * 4 + 3] = scale;
+  }
+
+  geom.setAttribute("offset", new ci(offsets, 3));
+  geom.setAttribute("aData", new ci(initialData, 4));
+  geom.instanceCount = DROPLET_COUNT;
+
+  const dropletUniforms = {
+    uTime: { value: 0 },
+    uMouse: { value: new P(9999, 9999, 9999) },
+    uPush: { value: 0 }
+  };
+
+  const dropletMat = new un({
+    uniforms: dropletUniforms,
+    transparent: true,
+    depthWrite: false,
+    side: Lt,
+    vertexShader: `
+      attribute vec3 offset;
+      attribute vec4 aData;
+      uniform float uTime;
+      uniform vec3 uMouse;
+      uniform float uPush;
+      varying vec2 vUv;
+      varying float vScale;
+
+      void main() {
+        vUv = uv;
+        float scale = aData.w;
+        vScale = scale;
+
+        vec3 worldPos = offset;
+        worldPos.y += sin(uTime * 2.8 + aData.x * 12.0) * 0.05;
+        worldPos.x += cos(uTime * 2.2 + aData.y * 3.0) * 0.04;
+
+        vec3 toM = worldPos - uMouse;
+        float d = length(toM);
+        if (d < 2.5) {
+          float force = (1.0 - d / 2.5) * uPush;
+          worldPos += normalize(toM + vec3(0.01)) * force * 0.75;
+          worldPos.y += force * 0.35;
+        }
+
+        vec4 mvPosition = modelViewMatrix * vec4(worldPos, 1.0);
+        mvPosition.xy += position.xy * scale;
+        gl_Position = projectionMatrix * mvPosition;
+      }
+    `,
+    fragmentShader: `
+      precision highp float;
+      varying vec2 vUv;
+      varying float vScale;
+
+      void main() {
+        vec2 coord = vUv * 2.0 - 1.0;
+        float r2 = dot(coord, coord);
+        if (r2 > 1.0) discard;
+
+        float z = sqrt(1.0 - r2);
+        vec3 N = normalize(vec3(coord, z));
+        vec3 sunDir = normalize(vec3(-0.45, 0.85, 0.4));
+        vec3 V = vec3(0.0, 0.0, 1.0);
+        vec3 H = normalize(sunDir + V);
+
+        float NdotH = max(dot(N, H), 0.0);
+        float spec = pow(NdotH, 68.0);
+        float sparkle = pow(NdotH, 180.0) * 1.6;
+
+        float caustic = pow(clamp(-N.y * 0.7 - N.x * 0.3 + 0.35, 0.0, 1.0), 2.5);
+        float fresnel = pow(1.0 - N.z, 2.8);
+
+        vec3 deepWater = vec3(0.03, 0.42, 0.80);
+        vec3 cyanCaustic = vec3(0.15, 0.85, 1.0);
+        vec3 sunWhite = vec3(1.0, 1.0, 1.0);
+
+        vec3 col = mix(deepWater, cyanCaustic, caustic * 0.85);
+        col += sunWhite * (spec * 1.7 + sparkle);
+        col += cyanCaustic * fresnel * 0.75;
+
+        float alpha = clamp(0.70 + fresnel * 0.28 + spec * 0.85, 0.0, 0.98);
+        gl_FragColor = vec4(col, alpha);
+        #include <tonemapping_fragment>
+        #include <colorspace_fragment>
+      }
+    `
+  });
+
+  const dropletMesh = new Dt(geom, dropletMat);
+  dropletMesh.frustumCulled = false;
+  scene.add(dropletMesh);
+
+  return {
+    uniforms: dropletUniforms,
+    update: (delta) => {
+      dropletUniforms.uTime.value += delta;
+    }
+  };
+}
+
+// -----------------------------------------------------------------------------
+// Main Scene Initialization & Animation Loop
+// -----------------------------------------------------------------------------
+function Kd() {
+  const i = new So({ antialias: true, alpha: true });
+  i.setPixelRatio(Math.min(devicePixelRatio, 2));
+  i.setSize(innerWidth, innerHeight);
+  i.toneMapping = ka;
+  i.toneMappingExposure = 1.15;
+  i.outputColorSpace = nt;
+  document.body.appendChild(i.domElement);
+
+  const e = new Id;
+  const t = new Ct(45, innerWidth / innerHeight, 0.1, 200);
+  t.position.set(0, 1, 14);
+  t.lookAt(0, 1, 0);
+  e.add(new kd(16777215, 0.85));
+
+  const n = new Vd(16774358, 1.2);
+  n.position.set(-6, 10, 8);
+  e.add(n);
+
+  const r = new Bd([
+    new P(-16, 2.6, 0),
+    new P(-8, -0.6, 0.3),
+    new P(-1, -2, 0.6),
+    new P(6, -0.6, 0.3),
+    new P(11, 3, -0.6),
+    new P(14.5, 9.5, -1.5)
+  ]);
+  const s = 0.78, o = 1.15, a = new P(0, 1, 0);
+
+  function l(T) {
+    const C = r.getPointAt(T),
+      w = r.getTangentAt(T).normalize(),
+      b = new P().crossVectors(w, a).normalize(),
+      k = new P().crossVectors(b, w).normalize();
+    return { P: C, T: w, B: b, N: k };
+  }
+
+  const c = jd(e, r, s, o, l);
+  const { uniforms: u } = Zd(e, r, s, o, l);
+  const drops3D = $d(e, t, r, s, o, l, a);
+
+  const d = new qd, f = new ze(10, 10), m = new P;
+  let g = false;
+  const _ = Yd();
+
+  addEventListener("pointermove", T => {
+    f.x = T.clientX / innerWidth * 2 - 1;
+    f.y = -(T.clientY / innerHeight) * 2 + 1;
+  });
+
+  const p = () => f.set(10, 10);
+  document.addEventListener("pointerleave", p);
+  document.addEventListener("pointerout", T => { T.relatedTarget || p(); });
+
+  function h() {
+    if (g = false, f.x > 2) return;
+    d.setFromCamera(f, t);
+    const T = d.intersectObject(c.mesh);
+    T.length && (m.copy(T[0].point), g = true);
+  }
+
+  const A = new Xd;
+  function S() {
+    requestAnimationFrame(S);
+    const T = Math.min(A.getDelta(), 0.05);
+    u.uTime.value += T;
+    c.uniforms.uTime.value += T;
+    drops3D.update(T);
+
+    h();
+
+    const C = _.update(T, g ? m : null);
+    u.uPush.value = C.strength;
+    u.uMouse.value.set(C.x, C.y, C.z);
+    c.uniforms.uPush.value = C.strength;
+    c.uniforms.uMouse.value.set(C.x, C.y, C.z);
+    drops3D.uniforms.uPush.value = C.strength;
+    drops3D.uniforms.uMouse.value.set(C.x, C.y, C.z);
+
+    i.render(e, t);
+  }
+  S();
+
+  addEventListener("resize", () => {
+    t.aspect = innerWidth / innerHeight;
+    t.updateProjectionMatrix();
+    i.setSize(innerWidth, innerHeight);
+  });
+}
+
+function Jd() {
+  const i = document.getElementById("hamburger");
+  i && i.addEventListener("click", () => {
+    i.classList.toggle("open");
+    const e = i.classList.contains("open");
+    i.setAttribute("aria-expanded", e);
+    const t = document.getElementById("mobile-menu");
+    t && (t.hidden = !e);
+  });
+}
+
+const ki = "kerf.guideSeen", Ha = "kerf.tour";
+function Qd({ storage: i, overlay: e, video: t }) {
+  const n = () => { try { return i.getItem(ki) === "1" } catch { return false } },
+    r = (o, a) => { try { i.setItem(o, a) } catch {} },
+    s = () => { try { t.pause() } catch {} };
+  return {
+    seen: n,
+    launch() {
+      if (n()) return false;
+      e.hidden = false, t.muted = false, t.currentTime = 0;
+      const o = t.play();
+      return o && typeof o.catch == "function" && o.catch(() => {}), true;
+    },
+    finish() { r(ki, "1"), s(), e.hidden = true; },
+    start() { r(Ha, JSON.stringify({ step: 0 })), r(ki, "1"), s(), e.hidden = true; },
+    cancel() { s(), e.hidden = true; },
+    reset() { try { i.removeItem(ki), i.removeItem(Ha) } catch {} }
+  };
+}
+
+function ep() {
+  try { return window.localStorage } catch { return { getItem: () => null, setItem: () => {}, removeItem: () => {} } }
+}
+
+function tp(i = document, e = ep()) {
+  const t = i.getElementById("guide"), n = i.getElementById("guide-video");
+  if (!t || !n) return null;
+  const r = Qd({ storage: e, overlay: t, video: n });
+  /[?&]guide=1(&|$)/.test(i.location ? i.location.search : "") && r.reset();
+  for (const s of i.querySelectorAll("[data-launch]")) s.addEventListener("click", o => { r.launch() && o.preventDefault() });
+  for (const s of i.querySelectorAll("[data-guide-done]")) s.addEventListener("click", () => r.finish());
+  for (const s of i.querySelectorAll("[data-guide-start]")) s.addEventListener("click", () => r.start());
+  for (const s of i.querySelectorAll("[data-guide-cancel]")) s.addEventListener("click", () => r.cancel());
+  return i.addEventListener("keydown", s => { s.key === "Escape" && !t.hidden && r.cancel() }), r;
+}
+
+Kd(); Jd(); tp();
+```
+
+================================================================================
+7. STEP 5: start-server.ps1 (ZERO-DEPENDENCY LOCAL SERVER)
+================================================================================
+Save the following PowerShell script to `start-server.ps1` in your project root.
+To start the site:
+Open PowerShell in the project directory and run:
+`powershell -ExecutionPolicy Bypass -File .\start-server.ps1`
+
+```powershell
+param([int]$Port = 3000)
+$ErrorActionPreference = "Continue"
+$rootDir = $PSScriptRoot
+if (-not $rootDir) { $rootDir = Get-Location }
+
+$listener = New-Object System.Net.HttpListener
+$prefix = "http://localhost:$Port/"
+$listener.Prefixes.Add($prefix)
+$listener.Start()
+
+Write-Host "Tern server running at $prefix" -ForegroundColor Green
+
+$mimeTypes = @{
+    ".html"  = "text/html; charset=utf-8"
+    ".js"    = "application/javascript; charset=utf-8"
+    ".css"   = "text/css; charset=utf-8"
+    ".json"  = "application/json; charset=utf-8"
+    ".png"   = "image/png"
+    ".jpg"   = "image/jpeg"
+    ".webp"  = "image/webp"
+    ".svg"   = "image/svg+xml"
+    ".ico"   = "image/x-icon"
+    ".mp4"   = "video/mp4"
+}
+
+function Send-Response {
+    param($Response, [int]$StatusCode, [string]$ContentType, [byte[]]$ContentBytes)
+    try {
+        $Response.StatusCode = $StatusCode
+        $Response.ContentType = $ContentType
+        $Response.AddHeader("Access-Control-Allow-Origin", "*")
+        $Response.ContentLength64 = $ContentBytes.Length
+        $output = $Response.OutputStream
+        $output.Write($ContentBytes, 0, $ContentBytes.Length)
+        $output.Close()
+    } catch {}
+}
+
+while ($listener.IsListening) {
+    try {
+        $context = $listener.GetContext()
+        $request = $context.Request
+        $response = $context.Response
+        $decodedUrl = [System.Uri]::UnescapeDataString($request.Url.AbsolutePath)
+
+        if ($request.HttpMethod -eq "OPTIONS") {
+            $response.StatusCode = 204
+            $response.AddHeader("Access-Control-Allow-Origin", "*")
+            $response.OutputStream.Close()
+            continue
+        }
+
+        $targetFile = $null
+        if ($decodedUrl -eq "/" -or $decodedUrl -eq "/index.html") {
+            $targetFile = Join-Path $rootDir "index.html"
+        } elseif ($decodedUrl -eq "/radar") {
+            $targetFile = Join-Path $rootDir "pages\radar.html"
+        } elseif ($decodedUrl -like "/trade*") {
+            $targetFile = Join-Path $rootDir "pages\trade_eth.html"
+        } elseif ($decodedUrl -eq "/portfolio") {
+            $targetFile = Join-Path $rootDir "pages\portfolio.html"
+        } elseif ($decodedUrl -eq "/yield") {
+            $targetFile = Join-Path $rootDir "pages\yield.html"
+        } elseif ($decodedUrl -eq "/theses") {
+            $targetFile = Join-Path $rootDir "pages\theses.html"
+        } elseif ($decodedUrl -eq "/recharge") {
+            $targetFile = Join-Path $rootDir "pages\recharge.html"
+        } elseif ($decodedUrl -eq "/launch") {
+            $targetFile = Join-Path $rootDir "pages\launch.html"
+        } elseif ($decodedUrl -eq "/docs") {
+            $targetFile = Join-Path $rootDir "pages\docs.html"
+        } elseif ($decodedUrl -like "/docs/*") {
+            $slug = $decodedUrl.Substring(6).Trim("/")
+            $docPath = Join-Path $rootDir "pages\docs\$slug.html"
+            $targetFile = if (Test-Path $docPath) { $docPath } else { Join-Path $rootDir "pages\docs.html" }
+        } else {
+            $relPath = $decodedUrl.TrimStart("/").Replace("/", "\")
+            $candidates = @((Join-Path $rootDir $relPath), (Join-Path $rootDir "public\$relPath"), (Join-Path $rootDir "pages\$relPath"))
+            foreach ($c in $candidates) {
+                if (Test-Path -Path $c -PathType Leaf) { $targetFile = $c; break }
+            }
+        }
+
+        if ($targetFile -and (Test-Path -Path $targetFile -PathType Leaf)) {
+            $ext = [System.IO.Path]::GetExtension($targetFile).ToLower()
+            $mime = if ($mimeTypes.ContainsKey($ext)) { $mimeTypes[$ext] } else { "application/octet-stream" }
+            $fileBytes = [System.IO.File]::ReadAllBytes($targetFile)
+            Send-Response -Response $response -StatusCode 200 -ContentType $mime -ContentBytes $fileBytes
+        } else {
+            $notFound = [System.Text.Encoding]::UTF8.GetBytes("<h1>404 Not Found</h1>")
+            Send-Response -Response $response -StatusCode 404 -ContentType "text/html; charset=utf-8" -ContentBytes $notFound
+        }
+    } catch {}
+}
+```
+
+================================================================================
+8. COPY-PASTE PROMPT FOR YOUR OTHER AI ASSISTANT
+================================================================================
+If you are giving this to another AI in your other tool, you can copy-paste
+this exact prompt:
+
+---
+"Please implement the realistic water effects and interactive water droplets from
+WATER_EFFECTS_GUIDE_AND_CODE.txt into our Tern project:
+1. Create `landing/assets/water-drops.css` with the optical styles and keyframe animations.
+2. Create `landing/assets/water-drops.js` with the interactive droplet clustering, surface tension wobble, click splash, and trickling physics.
+3. Link `water-drops.css` and `water-drops.js` in the `<head>` of `index.html`.
+4. In `landing/assets/index-D5smcTan.js`, update the Three.js scene setup:
+   - Replace function `jd` with the custom water surface ShaderMaterial (dynamic Gerstner wave displacement, Beer-Lambert oceanic color absorption, dancing caustics, sun specular glints, wave crest foam, and pointer wake).
+   - Update function `Zd` with the elevated fluid streamlines and foam crest shader.
+   - Implement function `$d` with the 550+ instanced 3D water droplets using analytical ray-sphere normals, diamond specular glints, internal caustics, and pointer splash explosions.
+   - Update `Kd` to animate and pass uniforms (`uTime`, `uMouse`, `uPush`) to `jd`, `Zd`, and `$d`.
+5. Run the local server using `start-server.ps1` on port 3000."
+---
+================================================================================
