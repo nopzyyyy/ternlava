@@ -1,0 +1,17 @@
+{
+  "cleanUrls": true,
+  "rewrites": [
+    { "source": "/radar", "destination": "/pages/radar.html" },
+    { "source": "/trade/(.*)", "destination": "/pages/trade_eth.html" },
+    { "source": "/trade", "destination": "/pages/trade_eth.html" },
+    { "source": "/portfolio", "destination": "/pages/portfolio.html" },
+    { "source": "/yield", "destination": "/pages/yield.html" },
+    { "source": "/theses", "destination": "/pages/theses.html" },
+    { "source": "/recharge", "destination": "/pages/recharge.html" },
+    { "source": "/launch", "destination": "/pages/launch.html" },
+    { "source": "/simulate", "destination": "/pages/simulate.html" },
+    { "source": "/docs", "destination": "/pages/docs/overview.html" },
+    { "source": "/docs/", "destination": "/pages/docs/overview.html" },
+    { "source": "/docs/:slug", "destination": "/pages/docs/:slug.html" }
+  ]
+}
