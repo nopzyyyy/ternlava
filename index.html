@@ -275,6 +275,15 @@
   }
 
   @media (max-width: 767.98px) {
+    .nav-pills,
+    .nav-social.desktop-only,
+    .nav-menu-btn.desktop-only {
+      display: none !important;
+    }
+    .nav {
+      padding: 1.25rem 1rem !important;
+      padding-top: 20px !important;
+    }
     .mobile-menu {
       background: rgba(20, 8, 5, 0.96) !important;
       backdrop-filter: blur(24px) !important;
@@ -306,6 +315,11 @@
       text-align: center !important;
       border-radius: 8px !important;
       border: none !important;
+    }
+    .hamburger {
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
     }
     .hamburger.open {
       background: rgba(255, 255, 255, 0.16) !important;
@@ -381,7 +395,7 @@
     <a class="pill" href="/trade/ETH" style="text-decoration:none">Trade</a>
     <a class="pill" href="/portfolio" style="text-decoration:none">Portfolio</a>
     <a class="pill" href="/yield" style="text-decoration:none">Yield</a>
-    <a class="pill" href="/theses" style="text-decoration:none">Theses</a>
+    <a class="pill" href="/theses" style="text-decoration:none">Thesis</a>
     <a class="pill" href="/recharge" style="text-decoration:none">Recharge</a>
     <a class="pill" href="/launch" style="text-decoration:none">Launch</a>
     <a class="pill" href="/docs" style="text-decoration:none">Docs</a>
@@ -406,7 +420,7 @@
   <a class="pill active" href="/trade/ETH" style="text-decoration:none">Trade</a>
   <a class="pill" href="/portfolio" style="text-decoration:none">Portfolio</a>
   <a class="pill" href="/yield" style="text-decoration:none">Yield</a>
-  <a class="pill" href="/theses" style="text-decoration:none">Theses</a>
+  <a class="pill" href="/theses" style="text-decoration:none">Thesis</a>
   <a class="pill" href="/recharge" style="text-decoration:none">Recharge</a>
   <a class="pill" href="/launch" style="text-decoration:none">Launch</a>
   <a class="pill" href="/docs" style="text-decoration:none">Docs</a>

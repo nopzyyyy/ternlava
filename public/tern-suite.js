@@ -161,82 +161,253 @@
     }
   }
 
-  // --- CONNECT WALLET ---
-  function wireWalletButtons() {
-    const buttons = document.querySelectorAll('.TopBar_btnGlass__mc1mc, [data-tour="connect-wallet"]');
-    buttons.forEach(btn => {
-      if (state.walletConnected) {
-        btn.innerHTML = '<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#10b981;margin-right:6px;"></span>0x5ad0...2d11';
-        btn.title = 'Connected: $96,450.00 USD';
-      }
+  // --- RAINBOWKIT CONNECT WALLET MODAL (KERF EXACT REPLICA) ---
+  function openWalletModal() {
+    let overlay = document.getElementById('tern-rk-modal-overlay');
+    if (overlay) overlay.remove();
 
+    overlay = document.createElement('div');
+    overlay.id = 'tern-rk-modal-overlay';
+    overlay.style.cssText = `
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.72);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      z-index: 999999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      opacity: 0;
+      transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    `;
+
+    overlay.innerHTML = `
+      <div id="tern-rk-dialog" style="
+        background: #1a1b1f;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 24px;
+        width: 100%;
+        max-width: 360px;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.85);
+        overflow: hidden;
+        color: #ffffff;
+        transform: scale(0.95);
+        transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        user-select: none;
+      ">
+        <!-- Header -->
+        <div style="display: flex; align-items: center; justify-content: space-between; padding: 18px 20px 14px 20px;">
+          <div style="width: 28px; display: flex; align-items: center;">
+            <div style="width: 2px; height: 14px; background: rgba(255, 255, 255, 0.2); border-radius: 1px;"></div>
+          </div>
+          <div style="font-size: 18px; font-weight: 700; color: #ffffff; letter-spacing: -0.01em; text-align: center; flex: 1;">
+            Connect a Wallet
+          </div>
+          <button id="tern-rk-close-btn" aria-label="Close" style="
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.08);
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255, 255, 255, 0.7);
+            padding: 0;
+            transition: all 0.15s ease;
+          ">
+            <svg width="12" height="12" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+              <line x1="2" y1="2" x2="12" y2="12"></line>
+              <line x1="12" y1="2" x2="2" y2="12"></line>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Inline Error Notice (Shown on wallet click) -->
+        <div id="tern-rk-error-banner" style="display: none; margin: 0 16px 10px 16px; padding: 10px 14px; border-radius: 12px; background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.35); color: #fca5a5; font-size: 12.5px; line-height: 1.4; align-items: center; gap: 10px;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+          </svg>
+          <span id="tern-rk-error-msg">Wallet not found. Please install the extension or app.</span>
+        </div>
+
+        <!-- Wallets List Container -->
+        <div style="padding: 0 8px;">
+          <!-- Section: Installed -->
+          <div style="font-size: 13px; font-weight: 700; color: #3888ff; padding: 6px 12px; margin-bottom: 2px;">Installed</div>
+          <div style="display: flex; flex-direction: column; gap: 2px;">
+            <!-- Trust Wallet -->
+            <button class="tern-rk-wallet-row" data-wallet="Trust Wallet" style="display: flex; align-items: center; gap: 14px; width: 100%; padding: 10px 12px; border-radius: 14px; background: transparent; border: 1px solid transparent; cursor: pointer; text-align: left; transition: all 0.15s ease;">
+              <div style="width: 28px; height: 28px; flex-shrink: 0; display: flex; align-items: center; justify-content: center;">
+                <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
+                  <path d="M16 3.5C21.8 6.5 27 7.2 27 7.2V17.5C27 24.2 21.2 29.2 16 30.5C10.8 29.2 5 24.2 5 17.5V7.2C5 7.2 10.2 6.5 16 3.5Z" fill="url(#twGradRk)" stroke="#0500FF" stroke-width="0.5"/>
+                  <defs>
+                    <linearGradient id="twGradRk" x1="5" y1="3.5" x2="27" y2="30.5" gradientUnits="userSpaceOnUse">
+                      <stop stop-color="#0500FF"/>
+                      <stop offset="0.6" stop-color="#0066FF"/>
+                      <stop offset="1" stop-color="#00E5FF"/>
+                    </linearGradient>
+                  </defs>
+                </svg>
+              </div>
+              <span style="font-size: 15px; font-weight: 700; color: #ffffff; flex: 1;">Trust Wallet</span>
+            </button>
+
+            <!-- MetaMask -->
+            <button class="tern-rk-wallet-row" data-wallet="MetaMask" style="display: flex; align-items: center; gap: 14px; width: 100%; padding: 10px 12px; border-radius: 14px; background: transparent; border: 1px solid transparent; cursor: pointer; text-align: left; transition: all 0.15s ease;">
+              <div style="width: 28px; height: 28px; flex-shrink: 0; display: flex; align-items: center; justify-content: center;">
+                <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
+                  <path d="M28.4 4.5L17.8 12.3L20 7.2L28.4 4.5Z" fill="#E2761B"/>
+                  <path d="M3.6 4.5L14.2 12.3L12 7.2L3.6 4.5Z" fill="#E4761B"/>
+                  <path d="M24.7 21.5L22 25.8L28 27.4L29.7 21.5H24.7Z" fill="#E4761B"/>
+                  <path d="M2.3 21.5L4 27.4L10 25.8L7.3 21.5H2.3Z" fill="#E4761B"/>
+                  <path d="M10.8 14.2L9.2 16.7L15.1 17L14.9 10.7L10.8 14.2Z" fill="#E4761B"/>
+                  <path d="M21.2 14.2L17.1 10.7L16.9 17L22.8 16.7L21.2 14.2Z" fill="#E4761B"/>
+                  <path d="M10.3 25.8L13.9 24.1L10.8 21.7L10.3 25.8Z" fill="#D7C1B3"/>
+                  <path d="M21.7 25.8L21.2 21.7L18.1 24.1L21.7 25.8Z" fill="#D7C1B3"/>
+                  <path d="M10.8 16.7L6.8 14.5L10.3 20.1L12 17.6L10.8 16.7Z" fill="#233447"/>
+                  <path d="M21.2 16.7L20 17.6L21.7 20.1L25.2 14.5L21.2 16.7Z" fill="#233447"/>
+                  <path d="M10.3 20.1L13.9 23.7L14.2 20.1H10.3Z" fill="#CD6116"/>
+                  <path d="M17.8 20.1L18.1 23.7L21.7 20.1H17.8Z" fill="#CD6116"/>
+                  <path d="M14.2 23.7L14.8 27.9L16 26.6L17.2 27.9L17.8 23.7L16 24.7L14.2 23.7Z" fill="#E4751F"/>
+                </svg>
+              </div>
+              <span style="font-size: 15px; font-weight: 700; color: #ffffff; flex: 1;">MetaMask</span>
+            </button>
+
+            <!-- Phantom -->
+            <button class="tern-rk-wallet-row" data-wallet="Phantom" style="display: flex; align-items: center; gap: 14px; width: 100%; padding: 10px 12px; border-radius: 14px; background: transparent; border: 1px solid transparent; cursor: pointer; text-align: left; transition: all 0.15s ease;">
+              <div style="width: 28px; height: 28px; flex-shrink: 0; display: flex; align-items: center; justify-content: center;">
+                <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
+                  <rect width="32" height="32" rx="8" fill="#AB9FF2"/>
+                  <path d="M24.5 16C24.5 11.3 20.7 7.5 16 7.5C11.3 7.5 7.5 11.3 7.5 16C7.5 19.8 9.5 23 12.3 24.5C12.7 23.6 13.5 22.9 14.6 22.9C15.6 22.9 16.2 23.6 16.6 24.5C17 23.6 17.8 22.9 18.9 22.9C19.9 22.9 20.6 23.6 21 24.5C23.2 23.1 24.5 20.3 24.5 16Z" fill="#FFFFFF"/>
+                  <circle cx="18.5" cy="14" r="1.5" fill="#534BBC"/>
+                  <circle cx="21.5" cy="14" r="1.5" fill="#534BBC"/>
+                </svg>
+              </div>
+              <span style="font-size: 15px; font-weight: 700; color: #ffffff; flex: 1;">Phantom</span>
+            </button>
+          </div>
+
+          <!-- Section: Popular -->
+          <div style="font-size: 13px; font-weight: 700; color: rgba(255, 255, 255, 0.45); padding: 12px 12px 6px 12px; margin-top: 4px;">Popular</div>
+          <div style="display: flex; flex-direction: column; gap: 2px;">
+            <!-- Browser Wallet -->
+            <button class="tern-rk-wallet-row" data-wallet="Browser Wallet" style="display: flex; align-items: center; gap: 14px; width: 100%; padding: 10px 12px; border-radius: 14px; background: transparent; border: 1px solid transparent; cursor: pointer; text-align: left; transition: all 0.15s ease;">
+              <div style="width: 28px; height: 28px; flex-shrink: 0; display: flex; align-items: center; justify-content: center;">
+                <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
+                  <rect width="32" height="32" rx="8" fill="#1C2438"/>
+                  <rect x="7" y="10" width="18" height="12" rx="2.5" fill="#FFFFFF"/>
+                  <rect x="18" y="14" width="4.5" height="4" rx="1.2" fill="#3888FF"/>
+                </svg>
+              </div>
+              <span style="font-size: 15px; font-weight: 700; color: #ffffff; flex: 1;">Browser Wallet</span>
+            </button>
+
+            <!-- Rainbow -->
+            <button class="tern-rk-wallet-row" data-wallet="Rainbow" style="display: flex; align-items: center; gap: 14px; width: 100%; padding: 10px 12px; border-radius: 14px; background: transparent; border: 1px solid transparent; cursor: pointer; text-align: left; transition: all 0.15s ease;">
+              <div style="width: 28px; height: 28px; flex-shrink: 0; display: flex; align-items: center; justify-content: center;">
+                <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
+                  <rect width="32" height="32" rx="8" fill="#0C0D10"/>
+                  <path d="M7 23.5C7 18.5294 11.0294 14.5 16 14.5C20.9706 14.5 25 18.5294 25 23.5" stroke="#FF4242" stroke-width="2.2" stroke-linecap="round"/>
+                  <path d="M9.5 23.5C9.5 19.9101 12.4101 17 16 17C19.5899 17 22.5 19.9101 22.5 23.5" stroke="#FFAE00" stroke-width="2.2" stroke-linecap="round"/>
+                  <path d="M12 23.5C12 21.2909 13.7909 19.5 16 19.5C18.2091 19.5 20 21.2909 20 23.5" stroke="#00E575" stroke-width="2.2" stroke-linecap="round"/>
+                  <path d="M14.5 23.5C14.5 22.6716 15.1716 22 16 22C16.8284 22 17.5 22.6716 17.5 23.5" stroke="#0091FF" stroke-width="2.2" stroke-linecap="round"/>
+                </svg>
+              </div>
+              <span style="font-size: 15px; font-weight: 700; color: #ffffff; flex: 1;">Rainbow</span>
+            </button>
+
+            <!-- WalletConnect -->
+            <button class="tern-rk-wallet-row" data-wallet="WalletConnect" style="display: flex; align-items: center; gap: 14px; width: 100%; padding: 10px 12px; border-radius: 14px; background: transparent; border: 1px solid transparent; cursor: pointer; text-align: left; transition: all 0.15s ease;">
+              <div style="width: 28px; height: 28px; flex-shrink: 0; display: flex; align-items: center; justify-content: center;">
+                <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
+                  <rect width="32" height="32" rx="8" fill="#3B99FC"/>
+                  <path d="M10.2 12.8C13.4 9.6 18.6 9.6 21.8 12.8L22.4 13.4C22.7 13.7 22.7 14.2 22.4 14.5L20.8 16.1C20.6 16.3 20.4 16.3 20.2 16.1L19.4 15.3C17.5 13.4 14.5 13.4 12.6 15.3L11.8 16.1C11.6 16.3 11.4 16.3 11.2 16.1L9.6 14.5C9.3 14.2 9.3 13.7 9.6 13.4L10.2 12.8ZM24.8 15.8L26.3 17.3C26.6 17.6 26.6 18.1 26.3 18.4L20.6 24.1C20.3 24.4 19.8 24.4 19.5 24.1L16.4 21C16.3 20.9 16.2 20.9 16.1 21L13 24.1C12.7 24.4 12.2 24.4 11.9 24.1L6.2 18.4C5.9 18.1 5.9 17.6 6.2 17.3L7.7 15.8C8 15.5 8.5 15.5 8.8 15.8L12.3 19.3C12.4 19.4 12.6 19.4 12.7 19.3L15.8 16.2C16.1 15.9 16.6 15.9 16.9 16.2L20 19.3C20.1 19.4 20.3 19.4 20.4 19.3L23.7 15.8C24.1 15.5 24.5 15.5 24.8 15.8Z" fill="#FFFFFF"/>
+                </svg>
+              </div>
+              <span style="font-size: 15px; font-weight: 700; color: #ffffff; flex: 1;">WalletConnect</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Footer -->
+        <div style="margin-top: 12px; padding: 14px 20px; border-top: 1px solid rgba(255, 255, 255, 0.08); display: flex; align-items: center; justify-content: space-between; font-size: 13px;">
+          <span style="color: rgba(255, 255, 255, 0.45); font-weight: 500;">New to Ethereum wallets?</span>
+          <a href="https://ethereum.org/en/wallets/" target="_blank" rel="noopener noreferrer" style="color: #3888ff; font-weight: 600; text-decoration: none; transition: opacity 0.15s;">Learn More</a>
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(overlay);
+    requestAnimationFrame(() => {
+      overlay.style.opacity = '1';
+      const dialog = overlay.querySelector('#tern-rk-dialog');
+      if (dialog) dialog.style.transform = 'scale(1)';
+    });
+
+    // Close button and backdrop click
+    const closeBtn = overlay.querySelector('#tern-rk-close-btn');
+    if (closeBtn) closeBtn.onclick = closeWalletModal;
+    overlay.onclick = (e) => {
+      if (e.target === overlay) closeWalletModal();
+    };
+
+    // Wallet rows click: simulate connection check and display error as requested
+    const rows = overlay.querySelectorAll('.tern-rk-wallet-row');
+    rows.forEach(row => {
+      row.onclick = (e) => {
+        e.preventDefault();
+        const walletName = row.getAttribute('data-wallet');
+
+        // Visual feedback on clicked button
+        row.style.borderColor = 'rgba(239, 68, 68, 0.5)';
+        row.style.background = 'rgba(239, 68, 68, 0.08)';
+        setTimeout(() => {
+          row.style.borderColor = 'transparent';
+          row.style.background = 'transparent';
+        }, 900);
+
+        // Show inline error banner in modal
+        const banner = overlay.querySelector('#tern-rk-error-banner');
+        const msg = overlay.querySelector('#tern-rk-error-msg');
+        if (banner && msg) {
+          msg.textContent = `Wallet not found. No ${walletName} provider detected. Please install extension or app.`;
+          banner.style.display = 'flex';
+          banner.style.animation = 'none';
+          void banner.offsetWidth; // force reflow
+          banner.style.animation = 'ternShake 0.35s ease';
+        }
+
+        // Trigger toast notification
+        showToast('Wallet Not Found', `No provider detected for ${walletName}. Please install the extension or app.`, 'error');
+      };
+    });
+  }
+
+  function closeWalletModal() {
+    const overlay = document.getElementById('tern-rk-modal-overlay');
+    if (overlay) {
+      overlay.style.opacity = '0';
+      const dialog = overlay.querySelector('#tern-rk-dialog');
+      if (dialog) dialog.style.transform = 'scale(0.95)';
+      setTimeout(() => overlay.remove(), 220);
+    }
+  }
+
+  // --- CONNECT WALLET WIRES ---
+  function wireWalletButtons() {
+    const buttons = document.querySelectorAll('.TopBar_btnGlass__mc1mc, [data-tour="connect-wallet"], .tern-connect-wallet-btn, [data-action="connect-wallet"]');
+    buttons.forEach(btn => {
       btn.onclick = (e) => {
         e.preventDefault();
-        if (state.walletConnected) {
-          openModal('Wallet Connected', `
-            <div style="text-align:center;padding:12px 0;">
-              <div style="width:54px;height:54px;border-radius:50%;background:rgba(16,185,129,0.15);border:1px solid #10b981;margin:0 auto 16px;display:flex;align-items:center;justify-content:center;color:#10b981;">
-                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-              </div>
-              <div style="font-size:15px;font-weight:600;margin-bottom:6px;">Robinhood Mainnet</div>
-              <div style="font-family:monospace;font-size:13px;color:rgba(255,255,255,0.6);margin-bottom:20px;">${state.walletAddress}</div>
-              <div style="background:rgba(255,255,255,0.04);padding:14px;border-radius:12px;display:flex;justify-content:space-between;margin-bottom:24px;">
-                <span style="color:rgba(255,255,255,0.6);">Portfolio Equity</span>
-                <span style="font-weight:600;color:#ffaa00;">$${state.userBalanceUsd.toLocaleString()} USD</span>
-              </div>
-              <button id="tern-disconnect-btn" style="width:100%;padding:12px;border-radius:10px;background:rgba(239,68,68,0.2);border:1px solid #ef4444;color:#ef4444;font-weight:600;cursor:pointer;">Disconnect</button>
-            </div>
-          `);
-          document.getElementById('tern-disconnect-btn').onclick = () => {
-            state.walletConnected = false;
-            btn.innerHTML = 'Connect';
-            closeModal();
-            showToast('Wallet Disconnected', 'Disconnected from Robinhood Mainnet', 'info');
-          };
-        } else {
-          openModal('Connect Wallet', `
-            <div style="display:flex;flex-direction:column;gap:10px;">
-              <button class="tern-wallet-choice" data-wallet="Demo" style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-radius:12px;background:rgba(255,120,0,0.12);border:1px solid rgba(255,120,0,0.3);color:#fff;cursor:pointer;font-weight:500;">
-                <span style="display:flex;align-items:center;gap:12px;">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffaa00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
-                  Quick Demo Trader (Funded)
-                </span>
-                <span style="color:#ffaa00;font-size:12px;font-weight:600;">$96.4K</span>
-              </button>
-              <button class="tern-wallet-choice" data-wallet="MetaMask" style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-radius:12px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);color:#fff;cursor:pointer;font-weight:500;">
-                <span style="display:flex;align-items:center;gap:12px;">
-                  <svg width="20" height="20" viewBox="0 0 32 32" fill="none"><path d="M28.4 4L17.5 12l2.3-5.3L28.4 4z" fill="#E2761B" stroke="#E2761B" stroke-width="0.5"/><path d="M3.6 4l10.8 8.1-2.2-5.4L3.6 4z" fill="#E4761B" stroke="#E4761B" stroke-width="0.5"/><path d="M24.7 21.8l-2.9 4.4 6.2 1.7 1.8-6.1-5.1 0z" fill="#E4761B"/><path d="M2.2 21.8l1.8 6.1 6.2-1.7-2.9-4.4-5.1 0z" fill="#E4761B"/><path d="M10.7 14.1l-1.7 2.6 6.1.3-.2-6.5-4.2 3.6z" fill="#E4761B"/><path d="M21.3 14.1l-4.1-3.7-.2 6.5 6.1-.3-1.8-2.5z" fill="#E4761B"/><path d="M10.2 26.2l3.7-1.8-3.2-2.5-.5 4.3z" fill="#D7C1B3"/><path d="M21.8 26.2l-.5-4.3-3.2 2.5 3.7 1.8z" fill="#D7C1B3"/></svg>
-                  MetaMask
-                </span>
-                <span style="color:rgba(255,255,255,0.4);font-size:12px;">Web3</span>
-              </button>
-              <button class="tern-wallet-choice" data-wallet="Coinbase" style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-radius:12px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);color:#fff;cursor:pointer;font-weight:500;">
-                <span style="display:flex;align-items:center;gap:12px;">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><rect width="20" height="20" rx="10" fill="#0052FF"/><rect x="7" y="7" width="6" height="6" rx="1.5" fill="#FFFFFF"/></svg>
-                  Coinbase Wallet
-                </span>
-                <span style="color:rgba(255,255,255,0.4);font-size:12px;">EVM</span>
-              </button>
-              <button class="tern-wallet-choice" data-wallet="WalletConnect" style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-radius:12px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);color:#fff;cursor:pointer;font-weight:500;">
-                <span style="display:flex;align-items:center;gap:12px;">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ff7700" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
-                  WalletConnect
-                </span>
-                <span style="color:rgba(255,255,255,0.4);font-size:12px;">Any wallet</span>
-              </button>
-            </div>
-          `);
-
-          document.querySelectorAll('.tern-wallet-choice').forEach(wb => {
-            wb.onclick = () => {
-              const name = wb.getAttribute('data-wallet');
-              state.walletConnected = true;
-              btn.innerHTML = '<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#10b981;margin-right:6px;"></span>0x5ad0...2d11';
-              closeModal();
-              showToast('Wallet Connected', `Connected ${name} to Robinhood Mainnet`, 'success');
-            };
-          });
-        }
+        openWalletModal();
       };
     });
   }
@@ -1885,9 +2056,24 @@
         0% { transform: rotate(0deg); }
         100% { transform: rotate(360deg); }
       }
+      @keyframes ternShake {
+        0%, 100% { transform: translateX(0); }
+        20%, 60% { transform: translateX(-5px); }
+        40%, 80% { transform: translateX(5px); }
+      }
       @keyframes ternTourFade {
         from { opacity: 0; transform: translateY(8px) scale(0.98); }
         to { opacity: 1; transform: translateY(0) scale(1); }
+      }
+      .tern-rk-wallet-row:hover {
+        background: rgba(255, 255, 255, 0.06) !important;
+      }
+      .tern-rk-wallet-row:active {
+        transform: scale(0.98) !important;
+      }
+      #tern-rk-close-btn:hover {
+        background: rgba(255, 255, 255, 0.16) !important;
+        color: #ffffff !important;
       }
       .recharge-coin-card {
         background: rgba(255, 255, 255, 0.03) !important;
@@ -2223,6 +2409,12 @@
     const isRecharge = window.location.pathname.startsWith('/recharge');
 
     navs.forEach(nav => {
+      // 0. Ensure Thesis pill text is always Thesis (not Theses)
+      const thesesLink = nav.querySelector('a[href="/theses"]');
+      if (thesesLink) {
+        thesesLink.textContent = 'Thesis';
+      }
+
       // 1. Ensure Recharge pill exists
       if (!nav.querySelector('a[href="/recharge"]')) {
         const rechargeLink = document.createElement('a');
@@ -2235,7 +2427,6 @@
         rechargeLink.innerText = 'Recharge';
         rechargeLink.style.textDecoration = 'none';
 
-        const thesesLink = nav.querySelector('a[href="/theses"]');
         if (thesesLink && thesesLink.nextSibling) {
           nav.insertBefore(rechargeLink, thesesLink.nextSibling);
         } else {
@@ -3060,11 +3251,15 @@
 
   // Global exposure
   window.startTernTour = startTernTour;
+  window.openWalletModal = openWalletModal;
+  window.closeWalletModal = closeWalletModal;
   window.TernApp = {
     state,
     showToast,
     openModal,
     closeModal,
+    openWalletModal,
+    closeWalletModal,
     selectMarket,
     setMarketFilter,
     startTour: startTernTour
