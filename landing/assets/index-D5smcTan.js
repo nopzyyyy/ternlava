@@ -4121,14 +4121,7 @@ function Kd() {
 }
 
 function Jd() {
-  const i = document.getElementById("hamburger");
-  i && i.addEventListener("click", () => {
-    i.classList.toggle("open");
-    const e = i.classList.contains("open");
-    i.setAttribute("aria-expanded", e);
-    const t = document.getElementById("mobile-menu");
-    t && (t.hidden = !e);
-  });
+  // Controlled by landing mobile menu controller in index.html
 }
 
 const ki = "kerf.guideSeen", Ha = "kerf.tour";
