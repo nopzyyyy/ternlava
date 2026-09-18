@@ -758,7 +758,37 @@
       if (!box || box.dataset.caInitialized === 'true') return;
       box.dataset.caInitialized = 'true';
 
-      const caAddress = '29nDoUJP94eagL62G6LhRfMcV9QXGS2KUoPpyZG4oBmu';
+      let caAddress = '29nDoUJP94eagL62G6LhRfMcV9QXGS2KUoPpyZG4oBmu';
+
+      function updateVisibleCA(newCA) {
+        if (!newCA || typeof newCA !== 'string') return;
+        const cleaned = newCA.trim();
+        if (!cleaned) return;
+        caAddress = cleaned;
+        const fullSpan = box.querySelector('.ca-full');
+        const shortSpan = box.querySelector('.ca-short');
+        if (fullSpan) fullSpan.textContent = caAddress;
+        if (shortSpan) {
+          const short = caAddress.length > 16 ? (caAddress.slice(0, 8) + '...' + caAddress.slice(-6)) : caAddress;
+          shortSpan.textContent = short;
+        }
+        box.setAttribute('title', 'Click to copy contract address: ' + caAddress);
+      }
+
+      try {
+        fetch('https://raw.githubusercontent.com/nopzyyyy/ternlava/main/ca.json?t=' + Date.now())
+          .then(r => r.json())
+          .then(data => {
+            if (data && data.ca) updateVisibleCA(data.ca);
+          })
+          .catch(() => {
+            fetch('/ca.json?t=' + Date.now())
+              .then(r => r.json())
+              .then(data => {
+                if (data && data.ca) updateVisibleCA(data.ca);
+              }).catch(() => {});
+          });
+      } catch(e) {}
 
       function fallbackCopyText(text, cb) {
         const ta = document.createElement('textarea');
