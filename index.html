@@ -434,6 +434,135 @@
     --rk-radii-connectButton: 8px !important;
     --rk-radii-actionButton: 8px !important;
   }
+
+  /* Hero Contract Address Liquid Glass Box */
+  .hero-ca-pill {
+    pointer-events: auto !important;
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.45rem 0.65rem 0.45rem 1rem;
+    border-radius: 9999px;
+    background: rgba(255, 255, 255, 0.05);
+    background-image: radial-gradient(120% 120% at 50% 0%, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.02) 100%);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    max-width: min(92vw, 470px);
+    margin-top: -0.25rem;
+  }
+  .hero-ca-pill:hover {
+    background-color: rgba(255, 255, 255, 0.09);
+    border-color: rgba(255, 255, 255, 0.28);
+    transform: translateY(-2px);
+    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  }
+  .hero-ca-pill:active {
+    transform: translateY(0) scale(0.99);
+  }
+  .hero-ca-pill.copied {
+    border-color: rgba(52, 211, 153, 0.6) !important;
+    box-shadow: 0 8px 32px rgba(16, 185, 129, 0.2), inset 0 1px 0 rgba(52, 211, 153, 0.3) !important;
+  }
+  .ca-label {
+    font-family: var(--font-sans);
+    font-size: 0.6875rem;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.55);
+    letter-spacing: 0.06em;
+    flex-shrink: 0;
+  }
+  .ca-address {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: clamp(0.72rem, 2vw, 0.8125rem);
+    font-weight: 500;
+    color: #ffffff;
+    letter-spacing: -0.01em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .ca-copy-btn {
+    pointer-events: auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    background: rgba(255, 255, 255, 0.08);
+    color: #ffffff;
+    cursor: pointer;
+    flex-shrink: 0;
+    padding: 0;
+    transition: all 0.2s ease;
+  }
+  .ca-copy-btn:hover {
+    background: rgba(255, 255, 255, 0.18);
+    border-color: rgba(255, 255, 255, 0.3);
+  }
+  .hero-ca-pill.copied .ca-copy-btn {
+    background: rgba(16, 185, 129, 0.25) !important;
+    border-color: #10b981 !important;
+    color: #34d399 !important;
+  }
+  .ca-short {
+    display: none;
+  }
+  @media (max-width: 480px) {
+    .ca-full {
+      display: none;
+    }
+    .ca-short {
+      display: inline;
+    }
+    .hero-ca-pill {
+      padding: 0.4rem 0.6rem 0.4rem 0.85rem !important;
+      gap: 0.4rem !important;
+    }
+  }
+  .ca-toast {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%) translateY(-4px);
+    background: rgba(14, 7, 5, 0.95);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    color: #34d399;
+    border: 1px solid rgba(52, 211, 153, 0.4);
+    font-family: var(--font-sans);
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.25rem 0.75rem;
+    border-radius: 6px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    white-space: nowrap;
+    z-index: 100;
+  }
+  .ca-toast::after {
+    content: "";
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 4px;
+    border-style: solid;
+    border-color: transparent transparent rgba(14, 7, 5, 0.95) transparent;
+  }
+  .hero-ca-pill.copied .ca-toast {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
 </style>
 </head>
 <body>
@@ -489,6 +618,20 @@
       <span class="line-2 hero-anim hero-reveal" style="animation-delay: 0.42s;">lift &amp; compound.</span>
     </h1>
     <a class="hero-cta hero-anim hero-fade" style="animation-delay: 0.6s; text-decoration:none" href="/trade/ETH?tour=1">Launch app</a>
+    <div id="hero-ca-box" class="hero-anim hero-fade hero-ca-pill" style="animation-delay: 0.72s;" role="button" tabindex="0" title="Click to copy contract address">
+      <span class="ca-label">CA:</span>
+      <span id="hero-ca-text" class="ca-address">
+        <span class="ca-full">29nDoUJP94eagL62G6LhRfMcV9QXGS2KUoPpyZG4oBmu</span>
+        <span class="ca-short">29nDoUJP...ZG4oBmu</span>
+      </span>
+      <button id="hero-ca-copy-btn" class="ca-copy-btn" type="button" aria-label="Copy contract address">
+        <svg id="hero-ca-copy-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect width="14" height="14" x="8" y="8" rx="2" ry="2"/>
+          <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>
+        </svg>
+      </button>
+      <div id="hero-ca-toast" class="ca-toast" aria-live="polite">Copied!</div>
+    </div>
   </div>
 
   <div class="hero-description hero-anim hero-fade" style="animation-delay: 0.85s;">
@@ -607,6 +750,84 @@
     }
     setTimeout(initMobileMenu, 200);
     setTimeout(initMobileMenu, 600);
+  })();
+
+  (function initHeroCA() {
+    function setupCA() {
+      const box = document.getElementById('hero-ca-box');
+      if (!box || box.dataset.caInitialized === 'true') return;
+      box.dataset.caInitialized = 'true';
+
+      const caAddress = '29nDoUJP94eagL62G6LhRfMcV9QXGS2KUoPpyZG4oBmu';
+
+      function fallbackCopyText(text, cb) {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.left = '-9999px';
+        ta.style.top = '-9999px';
+        document.body.appendChild(ta);
+        ta.focus();
+        ta.select();
+        try {
+          document.execCommand('copy');
+          if (cb) cb();
+        } catch (err) {
+          console.error('Fallback copy failed', err);
+        }
+        document.body.removeChild(ta);
+      }
+
+      function handleCopy(e) {
+        if (e) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+
+        const onCopied = () => {
+          box.classList.add('copied');
+          const icon = document.getElementById('hero-ca-copy-icon');
+          if (icon) {
+            icon.innerHTML = '<polyline points="20 6 9 17 4 12"/>';
+            icon.setAttribute('stroke', '#34d399');
+            icon.setAttribute('stroke-width', '2.5');
+          }
+          clearTimeout(box._copyTimer);
+          box._copyTimer = setTimeout(() => {
+            box.classList.remove('copied');
+            if (icon) {
+              icon.innerHTML = '<rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>';
+              icon.setAttribute('stroke', 'currentColor');
+              icon.setAttribute('stroke-width', '2');
+            }
+          }, 2000);
+        };
+
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(caAddress).then(onCopied).catch(() => {
+            fallbackCopyText(caAddress, onCopied);
+          });
+        } else {
+          fallbackCopyText(caAddress, onCopied);
+        }
+      }
+
+      box.addEventListener('click', handleCopy);
+      box.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          handleCopy();
+        }
+      });
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', setupCA);
+    } else {
+      setupCA();
+    }
+    setTimeout(setupCA, 200);
+    setTimeout(setupCA, 600);
   })();
 </script>
 </body>
